@@ -1,5 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
+import os
+from om import OrganizationsModel
+from oc import OrganizationsController
 
 LARGEFONT =("Verdana", 35)
   
@@ -8,12 +11,17 @@ class tkinterApp(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.frame = StartPage(self, self)
+        script_dir = os.path.abspath( os.path.dirname( __file__ ) )
+        self.db_path = script_dir + "\mentor_network.db"
 
     # to display the current frame passed as
     # parameter
     def show_frame(self, cont):
         self.frame.destroy()
         self.frame = cont(self, self)
+
+    def get_db_path(self):
+        return self.db_path
 
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
@@ -39,7 +47,8 @@ class Organizations(tk.Frame):
         self.grid_rowconfigure(0, weight = 1)
         self.grid_columnconfigure(0, weight = 1)
         self.container = self.get_initial_frame(self)
-        self.controller = controller
+        self.parent_controller = controller
+        self.controller = OrganizationsController(OrganizationsModel(r"" + controller.get_db_path()))
 
     # to display the current frame passed as
     # parameter
@@ -73,23 +82,67 @@ class Organizations(tk.Frame):
         button3 = ttk.Button(frame, text ="Delete", command = lambda : self.show_frame('delete'))
         button3.grid(row = 1, column = 3, padx = 10, pady = 10)
 
-        back_button = ttk.Button(frame, text ="Back", command = lambda : self.controller.show_frame(StartPage))
+        back_button = ttk.Button(frame, text ="Back", command = lambda : self.parent_controller.show_frame(StartPage))
         back_button.grid(row = 2, column = 2, padx = 10, pady = 10)
 
         return frame
 
     def get_add_frame(self,parent):
+        row_value = 0
+
         frame = tk.Frame(master=parent)
         frame.pack(side = "top", fill = "both", expand = True)
   
         frame.grid_rowconfigure(0, weight = 1)
         frame.grid_columnconfigure(0, weight = 1)
 
-        label = ttk.Label(frame, text ="Add", font = LARGEFONT)
-        label.grid(row = 0, column = 0)
+        label = ttk.Label(frame, text ="Add an organization", font = LARGEFONT)
+        label.grid(row = row_value, column = 0)
+        row_value += 1
+
+        org_name_label = tk.Label(frame,text="Organization Name")
+        org_name_label.grid(column=0, row=row_value)
+        org_name_entry = tk.Entry(frame,width=50)
+        org_name_entry.grid(column=1, row=row_value)
+        row_value += 1
+
+        address_label = tk.Label(frame,text="Address")
+        address_label.grid(column=0, row= row_value)
+        address_entry = tk.Entry(frame, width=50)
+        address_entry.grid(column=1, row= row_value)
+        row_value += 1
+
+        url_label = tk.Label(frame,text="Website URL")
+        url_label.grid(column=0, row=row_value)
+        url_entry = tk.Entry(frame, width=50)
+        url_entry.grid(column=1, row=row_value)
+        row_value += 1
+
+        cont_email_label = tk.Label(frame,text="Contact e-mail")
+        cont_email_label.grid(column=0, row=row_value)
+        cont_email_entry = tk.Entry(frame, width=50)
+        cont_email_entry.grid(column=1, row=row_value)
+        row_value += 1
+
+        cont_name_label = tk.Label(frame,text="Contact Name")
+        cont_name_label.grid(column=0, row=row_value)
+        cont_name_entry = tk.Entry(frame, width=50)
+        cont_name_entry.grid(column=1, row=row_value)
+        row_value += 1
+
+        self.controller.change_frame(frame)
+        self.controller.change_row(row_value)
+        row_value += 1
+
+        submit_button = tk.Button(frame,
+                                text="Submit", 
+                                command = lambda : self.controller.submit_data(org_name_entry, address_entry,
+                                                                            url_entry,cont_name_entry,cont_email_entry))
+        submit_button.grid(column=0, row=row_value)
+        row_value += 1
 
         back_button = ttk.Button(frame, text ="Back", command = lambda : self.show_frame('initial'))
-        back_button.grid(row = 1, column = 0)
+        back_button.grid(row = row_value, column = 0)
 
         return frame
 
