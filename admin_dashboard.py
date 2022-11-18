@@ -30,7 +30,7 @@ class StartPage(tk.Frame):
         self.grid_rowconfigure(0, weight = 1)
         self.grid_columnconfigure(0, weight = 1)
 
-        label = ttk.Label(self, text ="SP", font = LARGEFONT)
+        label = ttk.Label(self, text ="Admin Dashboard", font = LARGEFONT)
         label.grid(row = 0, column = 0)
 
         menu_frame = ttk.Label(self)
@@ -72,7 +72,7 @@ class Organizations(tk.Frame):
         frame.grid_rowconfigure(0, weight = 1)
         frame.grid_columnconfigure(0, weight = 1)
 
-        label = ttk.Label(frame, text="Org", font = LARGEFONT)
+        label = ttk.Label(frame, text="Organizations Menu", font = LARGEFONT)
         label.grid(row = 0, column = 0)
 
         menu_frame = tk.Label(frame)
@@ -101,7 +101,7 @@ class Organizations(tk.Frame):
         frame.grid_rowconfigure(0, weight = 1)
         frame.grid_columnconfigure(0, weight = 1)
 
-        label = ttk.Label(frame, text ="Add an organization", font = LARGEFONT)
+        label = ttk.Label(frame, text ="Add Menu", font = LARGEFONT)
         label.grid(row = row_value, column = 0)
         row_value += 1
 
@@ -123,7 +123,7 @@ class Organizations(tk.Frame):
         frame.grid_rowconfigure(1, weight = 1)
         frame.grid_columnconfigure(0, weight = 1)
 
-        label = ttk.Label(frame, text = "DM", font = LARGEFONT)
+        label = ttk.Label(frame, text = "Delete Menu", font = LARGEFONT)
         label.grid(row = 0, column = 0)
 
         records_frame = ttk.LabelFrame(frame)
@@ -145,7 +145,7 @@ class Organizations(tk.Frame):
         frame.grid_rowconfigure(0, weight = 1)
         frame.grid_columnconfigure(0, weight = 1)
 
-        label = ttk.Label(frame, text ="Modify", font = LARGEFONT)
+        label = ttk.Label(frame, text ="Modify Menu", font = LARGEFONT)
         label.grid(row = row_value, column = 0)
         row_value += 1
 
