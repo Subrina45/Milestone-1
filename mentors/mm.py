@@ -103,6 +103,18 @@ class MentorsModel:
         self.close_connection(conn)
         return rows
 
+    def select_mentor_by_subject_area(self, subject_area):
+        """
+        Query mentors by subject area
+        :param subject_area:
+        :return:
+        """
+        conn = self.create_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM mentors WHERE subject_area LIKE ?", ('%' + subject_area + '%',))
+        rows = cur.fetchall()
+        self.close_connection(conn)
+        return rows
 
     def delete_mentor(self, id):
         print('delete', id)

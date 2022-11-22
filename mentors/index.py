@@ -94,7 +94,7 @@ class Mentors(tk.Frame):
 
         search_bar_frame = tk.Frame(parent_frame)
 
-        search_lb = tk.Label(search_bar_frame, text='Search Mentor by Id:',
+        search_lb = tk.Label(search_bar_frame, text='Search Mentor by a subject area:',
                             font=mentors.fonts.sub)
         search_lb.pack(anchor=tk.W)
 
@@ -103,7 +103,7 @@ class Mentors(tk.Frame):
         search_entry.pack(anchor=tk.W)
 
         #New______________________________________________________________________________
-        search_entry.bind('<KeyRelease>', lambda e: find_mentor_by_id(search_entry.get()))
+        search_entry.bind('<KeyRelease>', lambda e: self.find_mentor_by_subject(record_table, search_entry.get()))
         #_________________________________________________________________________________
 
         search_bar_frame.pack(pady=0)
@@ -157,7 +157,7 @@ class Mentors(tk.Frame):
 
     def load_mentor_data(self, record_table):
         mentors = self.model.select_all()
-
+        print(mentors)
         for item in record_table.get_children():
             record_table.delete(item)
 
@@ -241,21 +241,15 @@ class Mentors(tk.Frame):
         self.load_mentor_data(record_table)
         self.clear_mentor_data(elements)
 
-    def find_mentor_by_id(men_id):
-        if men_id != "":
-            mentor_data_index = []
-
-            for data in mentor_data:
-                
-                if str(men_id) in str(data[0]):
-                    mentor_data_index.append(mentor_data.index(data))
-                    
+    def find_mentor_by_subject(self, record_table, subject_area):
+        if subject_area != "":
+            mentors = self.model.select_mentor_by_subject_area(subject_area)
 
             for item in record_table.get_children():
                 record_table.delete(item)
 
-            for r in mentor_data_index:
+            for r in range(len(mentors)):
                 record_table.insert(parent='', index='end', text='',
-                                    iid=r, values=mentor_data[r])
+                                iid=r, values=mentors[r])
         else:
-            load_mentor_data()
+            self.load_mentor_data(record_table)
