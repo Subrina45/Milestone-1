@@ -2,45 +2,26 @@ import tkinter as tk
 from tkinter import ttk
 import os
 from organizations.oc import OrganizationsController
+from mentors.index import Mentors
+from startMenu.sp import StartPage
 
-LARGEFONT =("Verdana", 35)
+LARGEFONT = ("Verdana", 35)
   
 class tkinterApp(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
-        self.frame = StartPage(self, self)
+        self.frame = StartPage(self)
         script_dir = os.path.abspath( os.path.dirname( __file__ ) )
         self.db_path = script_dir + "\mentor_network.db"
 
-    # to display the current frame passed as
-    # parameter
-    def show_frame(self, cont):
+    # display requested page
+    def show_frame(self, class_name):
         self.frame.destroy()
-        self.frame = cont(self, self)
+        self.frame = eval(class_name)(self)
 
     def get_db_path(self):
         return self.db_path
-
-class StartPage(tk.Frame):
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-
-        self.pack(side = "top", fill = "both", expand = True)
-        self.grid_rowconfigure(0, weight = 1)
-        self.grid_columnconfigure(0, weight = 1)
-
-        label = ttk.Label(self, text ="Admin Dashboard", font = LARGEFONT)
-        label.grid(row = 0, column = 0)
-
-        menu_frame = ttk.Label(self)
-        menu_frame.grid(row = 1, column = 0)
-
-        button1 = ttk.Button(menu_frame, text ="Organizations", command = lambda : controller.show_frame(Organizations))
-        button1.grid(row = 0, column = 0, padx=15, pady=15)
-  
-        button2 = ttk.Button(menu_frame, text ="Courses", command = lambda : controller.show_frame(Courses))
-        button2.grid(row = 0, column = 1, padx=15, pady=15)
 
 class Organizations(tk.Frame):
     def __init__(self, parent, parent_controller):
@@ -184,36 +165,7 @@ class Courses(tk.Frame):
         # putting the button in its place by
         # using grid
         button2.grid(row = 2, column = 1, padx = 10, pady = 10)
-  
-  
-  
-  
-# third window frame page2
-class Page2(tk.Frame):
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        label = ttk.Label(self, text ="p2", font = LARGEFONT)
-        label.grid(row = 0, column = 4, padx = 10, pady = 10)
-  
-        # button to show frame 2 with text
-        # layout2
-        button1 = ttk.Button(self, text ="Page 1",
-                            command = lambda : controller.show_frame(Courses))
-     
-        # putting the button in its place by
-        # using grid
-        button1.grid(row = 1, column = 1, padx = 10, pady = 10)
-  
-        # button to show frame 3 with text
-        # layout3
-        button2 = ttk.Button(self, text ="Organizations",
-                            command = lambda : controller.show_frame(Organizations))
-     
-        # putting the button in its place by
-        # using grid
-        button2.grid(row = 2, column = 1, padx = 10, pady = 10)
-  
-  
+
 # Driver Code
 app = tkinterApp()
 app.mainloop()
