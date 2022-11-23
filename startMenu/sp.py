@@ -20,7 +20,7 @@ class StartPage(tk.Frame):
         button1 = ttk.Button(menu_frame, text ="Organizations", command = lambda : parent.show_frame('Organizations'))
         button1.grid(row = 0, column = 0, padx=15, pady=15)
   
-        button2 = ttk.Button(menu_frame, text ="Courses", command = lambda : parent.show_frame('Courses'))
+        button2 = ttk.Button(menu_frame, text ="Programs / Courses", command = lambda : parent.show_frame('TrainingProgram'))
         button2.grid(row = 0, column = 1, padx=15, pady=15)
         
         button3 = ttk.Button(menu_frame, text = "Mentors", command = lambda : parent.show_frame('Mentors'))
