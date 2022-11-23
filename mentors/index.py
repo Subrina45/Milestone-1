@@ -62,32 +62,32 @@ class Mentors(tk.Frame):
         current_employer.place(x=110, y=350, width=180)
 
         #______________________________Buttons____________________________________________________
-        register_btn = tk.Button(head_frame, text='Register', font=('Bold', 12),
+        register_btn = tk.Button(head_frame, text='Register', font=mentors.fonts.mid,
                                 command=lambda: self.add_mentor_data(record_table, [first_name, last_name, 
                                                                     mentor_email, cell_phone,
                                                                     subject_area, current_employer]))
         register_btn.place(x=0, y=400)
 
-        update_btn = tk.Button(head_frame, text='Update', font=('Bold', 12),
+        update_btn = tk.Button(head_frame, text='Update', font=mentors.fonts.mid,
                             command=lambda: self.update_student_data(record_table, first_name, last_name, 
                                                                     mentor_email, cell_phone,
                                                                     subject_area, current_employer))
         update_btn.place(x=85, y=400)
 
-        delete_btn = tk.Button(head_frame, text='Delete', font=('Bold', 12),
+        delete_btn = tk.Button(head_frame, text='Delete', font=mentors.fonts.mid,
                             command=lambda: self.delete_mentor_data(record_table, [first_name, last_name,
                                                                     mentor_email, cell_phone,
                                                                     subject_area, current_employer]))
         delete_btn.place(x=160, y=400)
 
-        clear_btn = tk.Button(head_frame, text='Clear', font=('Bold', 12),
+        clear_btn = tk.Button(head_frame, text='Clear', font=mentors.fonts.mid,
                             command=lambda: self.clear_mentor_data([first_name, last_name,
                                                                     mentor_email, cell_phone,
                                                                     subject_area, current_employer])
                             )
         clear_btn.place(x=230, y=400)
 
-        back_btn = tk.Button(head_frame, text ="Back", font=('Bold', 12),
+        back_btn = tk.Button(head_frame, text ="Back", font=mentors.fonts.mid,
                             command = lambda : self.parent_controller.show_frame('StartPage'))
         back_btn.place(x=230, y=450)
         #________________________________Buttons____________________________________________________
