@@ -108,19 +108,22 @@ class TrainingProgram(tk.Frame):
         update_btn = tk.Button(head_frame, text='Update', font=programs.fonts.mid,
                             command=lambda: self.update_program(record_table, course_id_entry, course_name_entry, 
                                                                 subject_area_entry, start_date_entry, end_date_entry,
-                                                                start_time_entry, end_time_entry, op_menu_value))
+                                                                start_time_entry, end_time_entry, 
+                                                                start_time_type, end_time_type, op_menu_value))
         update_btn.place(x=85, y=400)
 
         delete_btn = tk.Button(head_frame, text='Delete', font=programs.fonts.mid,
                             command=lambda: self.delete_program(record_table, [course_id_entry, course_name_entry, 
                                                                 subject_area_entry, start_date_entry, end_date_entry,
-                                                                start_time_entry, end_time_entry], op_menu_value))
+                                                                start_time_entry, end_time_entry],
+                                                                start_time_type, end_time_type, op_menu_value))
         delete_btn.place(x=160, y=400)
 
         clear_btn = tk.Button(head_frame, text='Clear', font=programs.fonts.mid,
                             command=lambda: self.clear_inputs([course_id_entry, course_name_entry, 
                                                                 subject_area_entry, start_date_entry, end_date_entry,
-                                                                start_time_entry, end_time_entry], op_menu_value)
+                                                                start_time_entry, end_time_entry],
+                                                                start_time_type, end_time_type, op_menu_value)
                             )
         clear_btn.place(x=230, y=400)
 
@@ -198,7 +201,8 @@ class TrainingProgram(tk.Frame):
         #New___________________________________________________________________
         record_table.bind('<ButtonRelease-1>', lambda e: self.put_into_entries(record_table, course_id_entry, course_name_entry, 
                                                                             subject_area_entry, start_date_entry, end_date_entry,
-                                                                            start_time_entry, end_time_entry, op_menu_value))
+                                                                            start_time_entry, end_time_entry, start_time_type,
+                                                                            end_time_type, op_menu_value))
         #______________________________________________________________________
 
         record_table['column'] = ['ID', 'Course ID', 'Course Name', 'Subject Area', 'Organization Name', 
@@ -243,14 +247,15 @@ class TrainingProgram(tk.Frame):
             end_time_type = program_copy[-2]
             program_copy.pop(-2) # remove start time type
             program_copy[-3] = program_copy[-3] + start_time_type # format start time
-            program_copy[-2] = program_copy[-2] + end_time_type # format start time
+            program_copy[-2] = program_copy[-2] + end_time_type # format end time
             program_copy[4], program_copy[-1] = program_copy[-1], program_copy[4]
             record_table.insert(parent='', index='end', text='',
                                 iid=r, values=tuple(program_copy))
 
     def put_into_entries(self, record_table, course_id_entry, course_name_entry,
                         subject_area_entry, start_date_entry, end_date_entry,
-                        start_time_entry, end_time_entry, op_menu_value):
+                        start_time_entry, end_time_entry, start_time_type,
+                        end_time_type, op_menu_value):
         curItem = record_table.focus()
         values = record_table.item(curItem)['values']
         program_id = values[0]
@@ -272,21 +277,27 @@ class TrainingProgram(tk.Frame):
         stat_date = program[4]
         end_date = program[5]
         start_time = program[6]
-        end_time = program[7]
+        start_t_type = program[7]
+        end_time = program[8]
+        end_t_type = program[9]
         org_name = program[-1]
-        
+
         course_id_entry.insert(0, course_id)
         course_name_entry.insert(0, course_name)
         subject_area_entry.insert(0, sub_area)
         start_date_entry.insert(0, stat_date)
         end_date_entry.insert(0, end_date)
         start_time_entry.insert(0, start_time)
+        start_time_type.set(start_t_type)
         end_time_entry.insert(0, end_time)
+        end_time_type.set(end_t_type)
         op_menu_value.set(org_name)
 
-    def clear_inputs(self, entries, org_option):
+    def clear_inputs(self, entries, start_time_type, end_time_type, org_option):
         for element in entries:
             element.delete(0, tk.END)
+        start_time_type.set("AM")
+        end_time_type.set('AM')
         org_option.set("Choose an organization")
 
     def add_program(self, record_table, elements, time_types, org_option):
@@ -306,12 +317,13 @@ class TrainingProgram(tk.Frame):
         print(values)
 
         id = self.model.add_trainingProgram(tuple(values))
-        self.clear_inputs(elements, org_option)
+        self.clear_inputs(elements, time_types[0], time_types[1], org_option)
         self.load_data(record_table)
 
     def update_program(self, record_table, course_id_entry, course_name_entry, 
                         subject_area_entry, start_date_entry, end_date_entry,
-                        start_time_entry, end_time_entry, op_menu_value):
+                        start_time_entry, end_time_entry, 
+                        start_time_type, end_time_type, op_menu_value):
         curItem = record_table.focus()
         program_id = record_table.item(curItem)['values'][0]
         organization_id = self.org_model.select_by_name(op_menu_value.get())[0][0]
@@ -322,7 +334,9 @@ class TrainingProgram(tk.Frame):
         values.append(start_date_entry.get())
         values.append(end_date_entry.get())
         values.append(start_time_entry.get())
+        values.append(start_time_type.get())
         values.append(end_time_entry.get())
+        values.append(end_time_type.get())
         values.append(organization_id)
         values.append(program_id)
 
@@ -331,16 +345,17 @@ class TrainingProgram(tk.Frame):
         self.load_data(record_table)
         self.clear_inputs([course_id_entry, course_name_entry, 
                         subject_area_entry, start_date_entry, end_date_entry,
-                        start_time_entry, end_time_entry], op_menu_value)
+                        start_time_entry, end_time_entry], 
+                        start_time_type, end_time_type, op_menu_value)
 
-    def delete_program(self, record_table, elements, op_menu_value):
+    def delete_program(self, record_table, elements, start_time_type, end_time_type, op_menu_value):
         curItem = record_table.focus()
         values = record_table.item(curItem)['values']
         program_id = values[0]
         print(program_id)
         self.model.delete_trainingProgram(program_id)
         self.load_data(record_table)
-        self.clear_inputs(elements, op_menu_value)
+        self.clear_inputs(elements, start_time_type, end_time_type, op_menu_value)
 
     def find_program_by_org(self, record_table, org_name):
         if org_name != "":
