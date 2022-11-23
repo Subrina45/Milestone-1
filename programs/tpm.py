@@ -39,11 +39,11 @@ class TrainingProgramModel:
                         start_date TEXT NOT NULL,
                         end_date TEXT NOT NULL,
                         start_time TEXT NOT NULL,
-                        end_time TEXT NOT NULL
+                        end_time TEXT NOT NULL,
+                        organization_id INTEGER NULL
                 ); """)
         self.close_connection(conn)
 
-#
     def add_trainingProgram(self, trainingProgram):
         """
         Create a new trainingProgram into the trainingProgram table
@@ -51,8 +51,8 @@ class TrainingProgramModel:
         :return: course_id
         """
         conn = self.create_connection()
-        sql = ''' INSERT INTO TrainingProgram(course_id,course_name,subject_area,start_date,end_date,start_time,end_time)
-              VALUES(?,?,?,?,?,?,?) '''
+        sql = ''' INSERT INTO TrainingProgram(course_id,course_name,subject_area,start_date,end_date,start_time,end_time,organization_id)
+              VALUES(?,?,?,?,?,?,?,?) '''
         cur = conn.cursor()
         cur.execute(sql, trainingProgram)
         conn.commit()
@@ -73,7 +73,8 @@ class TrainingProgramModel:
                     start_date = ? ,
                     end_date = ? ,
                     start_time = ? ,
-                    end_time = ?
+                    end_time = ? ,
+                    organization_id = ?
                 WHERE id = ?'''
         cur = conn.cursor()
         cur.execute(sql, trainingProgram)
@@ -88,7 +89,7 @@ class TrainingProgramModel:
         """
         conn = self.create_connection()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM TrainingProgram")
+        cur.execute("SELECT TrainingProgram.*, organizations.name FROM TrainingProgram JOIN organizations ON organizations.id = TrainingProgram.organization_id")
         rows = cur.fetchall()
         self.close_connection(conn)
         return rows
@@ -115,7 +116,13 @@ class TrainingProgramModel:
         """
         conn = self.create_connection()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM TrainingProgram WHERE id=?", (id,))
+        cur.execute("""
+                    SELECT TrainingProgram.*, organizations.name
+                    FROM TrainingProgram 
+                    JOIN organizations 
+                    ON organizations.id = TrainingProgram.organization_id
+                    WHERE TrainingProgram.id=?
+                    """, (id,))
         rows = cur.fetchall()
         self.close_connection(conn)
         return rows
