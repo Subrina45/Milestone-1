@@ -17,10 +17,15 @@ class TrainingProgram(tk.Frame):
         self.container = self.get_initial_frame(self)
 
     def get_initial_frame(self, parent_frame):
+        time_types = [
+        "AM",
+        "PM",
+        ]
+
         head_frame = tk.Frame(parent_frame)
         head_frame.pack(pady=10)
         head_frame.pack_propagate(False)
-        head_frame.configure(width=400, height=600)
+        head_frame.configure(width=400, height=490)
 
         heading_lb = tk.Label(head_frame, text='Programs and Courses Registration System',
                      font=programs.fonts.main,
@@ -76,21 +81,28 @@ class TrainingProgram(tk.Frame):
 
         start_time_lb = tk.Label(head_frame, text='Start Time:', font=programs.fonts.sub)
         start_time_lb.place(x=0, y=300)
-
         start_time_entry = tk.Entry(head_frame, font=programs.fonts.sub)
-        start_time_entry.place(x=110, y=300, width=180)
+        start_time_entry.place(x=110, y=300, width=100)
+        start_time_type = tk.StringVar()
+        start_time_type.set(time_types[0]) # default value
+        start_time_ops = tk.OptionMenu(head_frame, start_time_type, *time_types)
+        start_time_ops.place(x=200, y=300, width=60)
 
         end_time_lb = tk.Label(head_frame, text='End Time:', font=programs.fonts.sub)
         end_time_lb.place(x=0, y=350)
-
         end_time_entry = tk.Entry(head_frame, font=programs.fonts.sub)
-        end_time_entry.place(x=110, y=350, width=180)
+        end_time_entry.place(x=110, y=350, width=100)
+        end_time_type = tk.StringVar()
+        end_time_type.set(time_types[0]) # default value
+        end_time_ops = tk.OptionMenu(head_frame, end_time_type, *time_types)
+        end_time_ops.place(x=200, y=350, width=60)
 
         #______________________________Buttons____________________________________________________
         register_btn = tk.Button(head_frame, text='Register', font=programs.fonts.mid,
                                 command=lambda: self.add_program(record_table, [course_id_entry, course_name_entry, 
                                                                 subject_area_entry, start_date_entry, end_date_entry,
-                                                                start_time_entry, end_time_entry], op_menu_value))
+                                                                start_time_entry, end_time_entry],
+                                                                [start_time_type, end_time_type], op_menu_value))
         register_btn.place(x=0, y=400)
 
         update_btn = tk.Button(head_frame, text='Update', font=programs.fonts.mid,
@@ -114,27 +126,62 @@ class TrainingProgram(tk.Frame):
 
         back_btn = tk.Button(head_frame, text ="Back", font=programs.fonts.mid,
                             command = lambda : self.parent_controller.show_frame('StartPage'))
-        back_btn.place(x=230, y=450)
+        back_btn.place(x=230, y=440)
         #________________________________Buttons____________________________________________________
 
+
+        # Search Section --------------------------------------------------------------------------
         search_bar_frame = tk.Frame(parent_frame)
+        search_bar_frame.pack(pady=0)
+        search_bar_frame.pack_propagate(False)
+        search_bar_frame.configure(width=450, height=120)
+
+        search_lb = tk.Label(search_bar_frame,
+                            text='Search a course/program for a given time window',
+                            font=programs.fonts.sub)
+        search_lb.pack(anchor=tk.W)
+        search_from_lb = tk.Label(search_bar_frame, text='From:', font=programs.fonts.sub)
+        search_from_lb.pack(anchor=tk.W)
+        # search_from_lb.place(x=0, y=20)
+        search_start_time = tk.Entry(search_bar_frame, font=programs.fonts.sub)
+        search_start_time.place(x=50, y=25, width=50)
+
+        from_meridiem = tk.StringVar()
+        from_meridiem.set(time_types[0]) # default value
+        from_ops = tk.OptionMenu(search_bar_frame, from_meridiem, *time_types)
+        from_ops.place(x=110, y=25, width=60)
+        search_start_time.bind('<KeyRelease>', lambda e: self.find_program_by_time(record_table, 
+                                                                                    search_start_time.get(),
+                                                                                    from_meridiem.get(),
+                                                                                    search_end_time.get(),
+                                                                                    to_meridiem.get()
+                                                                                    ))
+
+        search_to_lb = tk.Label(search_bar_frame, text='To:', font=programs.fonts.sub)
+        search_to_lb.pack(anchor=tk.W)
+        search_end_time = tk.Entry(search_bar_frame, font=programs.fonts.sub)
+        search_end_time.place(x=50, y=50, width=50)
+        to_meridiem = tk.StringVar()
+        to_meridiem.set(time_types[1]) # default value
+        to_ops = tk.OptionMenu(search_bar_frame, to_meridiem, *time_types)
+        to_ops.place(x=110, y=50, width=60)
+        search_end_time.bind('<KeyRelease>', lambda e: self.find_program_by_time(record_table, 
+                                                                                search_start_time.get(),
+                                                                                from_meridiem.get(),
+                                                                                search_end_time.get(),
+                                                                                to_meridiem.get()
+                                                                                ))
+
 
         search_lb = tk.Label(search_bar_frame,
                             text='Search a course/program for a specified university or training organization',
                             font=programs.fonts.sub)
-        search_lb.pack(anchor=tk.W)
-
-        search_by_org_entry = tk.Entry(search_bar_frame,
-                            font=programs.fonts.sub)
+        search_lb.pack(anchor=tk.W, pady=5)
+        search_by_org_entry = tk.Entry(search_bar_frame, font=programs.fonts.sub)
         search_by_org_entry.pack(anchor=tk.W)
-
-        #New______________________________________________________________________________
         search_by_org_entry.bind('<KeyRelease>', lambda e: self.find_program_by_org(record_table, search_by_org_entry.get()))
-        #_________________________________________________________________________________
+        # Search Section End --------------------------------------------------------------------------
 
-        search_bar_frame.pack(pady=0)
-        search_bar_frame.pack_propagate(False)
-        search_bar_frame.configure(width=400, height=50)
 
         record_frame = tk.Frame(parent_frame)
         record_frame.pack(pady=10)
@@ -189,7 +236,14 @@ class TrainingProgram(tk.Frame):
 
         for r in range(len(programs)):
             program_copy = list(programs[r]).copy()
-            program_copy.pop(-2)
+            print(program_copy)
+            program_copy.pop(-2) # remove organizations id
+            start_time_type = program_copy[-4]
+            program_copy.pop(-4) # remove start time type
+            end_time_type = program_copy[-2]
+            program_copy.pop(-2) # remove start time type
+            program_copy[-3] = program_copy[-3] + start_time_type # format start time
+            program_copy[-2] = program_copy[-2] + end_time_type # format start time
             program_copy[4], program_copy[-1] = program_copy[-1], program_copy[4]
             record_table.insert(parent='', index='end', text='',
                                 iid=r, values=tuple(program_copy))
@@ -235,15 +289,22 @@ class TrainingProgram(tk.Frame):
             element.delete(0, tk.END)
         org_option.set("Choose an organization")
 
-    def add_program(self, record_table, elements, org_option):
+    def add_program(self, record_table, elements, time_types, org_option):
         values = []
         organization_id = self.org_model.select_by_name(org_option.get())[0][0]
 
-        for element in elements:
-            values.append(element.get())
-
+        values.append(elements[0].get())
+        values.append(elements[1].get())
+        values.append(elements[2].get())
+        values.append(elements[3].get())
+        values.append(elements[4].get())
+        values.append(elements[5].get())
+        values.append(time_types[0].get())
+        values.append(elements[6].get())
+        values.append(time_types[1].get())
         values.append(organization_id)
         print(values)
+
         id = self.model.add_trainingProgram(tuple(values))
         self.clear_inputs(elements, org_option)
         self.load_data(record_table)
@@ -294,5 +355,14 @@ class TrainingProgram(tk.Frame):
                 program_copy[4], program_copy[-1] = program_copy[-1], program_copy[4]
                 record_table.insert(parent='', index='end', text='',
                                 iid=r, values=tuple(program_copy))
+        else:
+            self.load_data(record_table)
+
+    def find_program_by_time(self, record_table, start_time, start_type, end_time, end_type):
+        if start_time != "" or end_time != "":
+            print(start_time, start_type, end_time, end_type)
+            programs = self.model.select_program_by_time(start_time + start_type, end_time + end_type)
+            print(programs)
+            
         else:
             self.load_data(record_table)

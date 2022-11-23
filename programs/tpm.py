@@ -39,7 +39,9 @@ class TrainingProgramModel:
                         start_date TEXT NOT NULL,
                         end_date TEXT NOT NULL,
                         start_time TEXT NOT NULL,
+                        start_time_type TEXT NOT NULL,
                         end_time TEXT NOT NULL,
+                        end_time_type TEXT NOT NULL,
                         organization_id INTEGER NULL
                 ); """)
         self.close_connection(conn)
@@ -51,8 +53,15 @@ class TrainingProgramModel:
         :return: course_id
         """
         conn = self.create_connection()
-        sql = ''' INSERT INTO TrainingProgram(course_id,course_name,subject_area,start_date,end_date,start_time,end_time,organization_id)
-              VALUES(?,?,?,?,?,?,?,?) '''
+        sql = '''
+                INSERT INTO TrainingProgram(course_id, course_name,
+                                            subject_area,
+                                            start_date, end_date,
+                                            start_time, start_time_type,
+                                            end_time, end_time_type,
+                                            organization_id)
+                VALUES(?,?,?,?,?,?,?,?,?,?)
+            '''
         cur = conn.cursor()
         cur.execute(sql, trainingProgram)
         conn.commit()
@@ -62,7 +71,11 @@ class TrainingProgramModel:
 
     def update_trainingProgram(self, trainingProgram):
         """
-        update course_id, course_name, subject_area, start_date, end_date, start_time,and end_date  of trainingProgram
+        update course_id, course_name, 
+                subject_area, start_date, 
+                end_date, start_time, start_time_type,
+                end_time, end_time_type, and
+                organization_id of trainingProgram
         :param trainingProgram:
         """
         conn = self.create_connection()
@@ -73,7 +86,9 @@ class TrainingProgramModel:
                     start_date = ? ,
                     end_date = ? ,
                     start_time = ? ,
+                    start_time_type = ? ,
                     end_time = ? ,
+                    end_time_type = ? ,
                     organization_id = ?
                 WHERE id = ?'''
         cur = conn.cursor()
@@ -142,6 +157,29 @@ class TrainingProgramModel:
                     ON organizations.id = TrainingProgram.organization_id
                     WHERE organizations.name LIKE ?
                     """, ('%' + org_name + '%',))
+        rows = cur.fetchall()
+        self.close_connection(conn)
+        return rows
+
+    def select_program_by_time(self, start_time, end_time):
+        print('start_time', start_time, 'end_time', end_time)
+        """
+        Query mentors by subject area
+        :param subject_area:
+        :return:
+        """
+        conn = self.create_connection()
+        cur = conn.cursor()
+        cur.execute("""
+                    SELECT TrainingProgram.*, organizations.name
+                    FROM TrainingProgram
+                    JOIN organizations 
+                    ON organizations.id = TrainingProgram.organization_id
+                    WHERE
+                        TrainingProgram.start_time LIKE ?
+                    AND
+                        TrainingProgram.end_time LIKE ?
+                    """, ('%' + start_time + '%','%' + end_time + '%'))
         rows = cur.fetchall()
         self.close_connection(conn)
         return rows
