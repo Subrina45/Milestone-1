@@ -127,7 +127,7 @@ class TrainingProgramModel:
         self.close_connection(conn)
         return rows
 
-    def select_mentor_by_subject_area(self, subject_area):
+    def select_program_by_org_name(self, org_name):
         """
         Query mentors by subject area
         :param subject_area:
@@ -135,7 +135,13 @@ class TrainingProgramModel:
         """
         conn = self.create_connection()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM mentors WHERE subject_area LIKE ?", ('%' + subject_area + '%',))
+        cur.execute("""
+                    SELECT TrainingProgram.*, organizations.name
+                    FROM TrainingProgram
+                    JOIN organizations 
+                    ON organizations.id = TrainingProgram.organization_id
+                    WHERE organizations.name LIKE ?
+                    """, ('%' + org_name + '%',))
         rows = cur.fetchall()
         self.close_connection(conn)
         return rows

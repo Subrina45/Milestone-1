@@ -240,7 +240,6 @@ class TrainingProgram(tk.Frame):
         organization_id = self.org_model.select_by_name(org_option.get())[0][0]
 
         for element in elements:
-            print(element.get())
             values.append(element.get())
 
         values.append(organization_id)
@@ -284,13 +283,16 @@ class TrainingProgram(tk.Frame):
 
     def find_program_by_org(self, record_table, org_name):
         if org_name != "":
-            mentors = self.model.select_mentor_by_subject_area(org_name)
+            programs = self.model.select_program_by_org_name(org_name)
 
             for item in record_table.get_children():
                 record_table.delete(item)
 
-            for r in range(len(mentors)):
+            for r in range(len(programs)):
+                program_copy = list(programs[r]).copy()
+                program_copy.pop(-2)
+                program_copy[4], program_copy[-1] = program_copy[-1], program_copy[4]
                 record_table.insert(parent='', index='end', text='',
-                                iid=r, values=mentors[r])
+                                iid=r, values=tuple(program_copy))
         else:
             self.load_data(record_table)
