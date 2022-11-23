@@ -101,3 +101,16 @@ class OrganizationsModel:
         cur.execute(sql, (id,))
         conn.commit()
         self.close_connection(conn)
+
+    def select_by_name(self, name):
+        """
+        Query organiations by name
+        :param name:
+        :return:
+        """
+        conn = self.create_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM organizations WHERE name=?", (name,))
+        rows = cur.fetchall()
+        self.close_connection(conn)
+        return rows
