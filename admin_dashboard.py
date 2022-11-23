@@ -3,6 +3,7 @@ from tkinter import ttk
 import os
 from organizations.oc import OrganizationsController
 from mentors.index import Mentors
+from programs.index import TrainingProgram
 from startMenu.sp import StartPage
 
 LARGEFONT = ("Verdana", 35)
@@ -11,6 +12,9 @@ class tkinterApp(tk.Tk):
 
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
+        # When the program is started
+        # StartPage handles the initial 
+        # menu displayed
         self.frame = StartPage(self)
         script_dir = os.path.abspath( os.path.dirname( __file__ ) )
         self.db_path = script_dir + "\mentor_network.db"
@@ -24,14 +28,14 @@ class tkinterApp(tk.Tk):
         return self.db_path
 
 class Organizations(tk.Frame):
-    def __init__(self, parent, parent_controller):
+    def __init__(self, parent):
         tk.Frame.__init__(self, parent)
         self.pack(side = "top", fill = "both", expand = True)
         self.grid_rowconfigure(0, weight = 1)
         self.grid_columnconfigure(0, weight = 1)
+        self.controller = OrganizationsController(parent.get_db_path())
+        self.parent_controller = parent
         self.container = self.get_initial_frame(self)
-        self.parent_controller = parent_controller
-        self.controller = OrganizationsController(self.parent_controller.get_db_path())
 
     # to display the current frame passed as
     # parameter
