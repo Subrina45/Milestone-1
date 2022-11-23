@@ -72,7 +72,7 @@ class Organizations(tk.Frame):
         button3 = ttk.Button(menu_frame, text ="Delete", command = lambda : self.show_frame('delete'))
         button3.grid(row = 1, column = 3, padx = 10, pady = 10)
 
-        back_button = ttk.Button(menu_frame, text ="Back", command = lambda : self.parent_controller.show_frame(StartPage))
+        back_button = ttk.Button(menu_frame, text ="Back", command = lambda : self.parent_controller.show_frame('StartPage'))
         back_button.grid(row = 2, column = 2, padx = 10, pady = 10)
 
         return frame
