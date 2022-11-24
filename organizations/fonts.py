@@ -1,0 +1,1 @@
+LARGE = ("Verdana", 35)
