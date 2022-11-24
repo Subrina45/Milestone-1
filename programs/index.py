@@ -25,36 +25,48 @@ class TrainingProgram(tk.Frame):
         ]
 
         head_frame = tk.Frame(parent_frame)
-        head_frame.pack(pady=10)
-        head_frame.pack_propagate(False)
-        head_frame.configure(width=400, height=490)
+        head_frame.grid(row = 0, column = 0)
+        head_frame.grid_rowconfigure(0, weight = 1)
+        head_frame.grid_columnconfigure(0, weight = 1)
 
         heading_lb = tk.Label(head_frame, text='Programs and Courses Registration System',
                      font=programs.fonts.main,
                      bg='pink')
-        heading_lb.pack(fill=tk.X, pady=5)
+        heading_lb.grid(row = 0, column = 0)
 
-        course_id_lb = tk.Label(head_frame, text='Course ID:', font=programs.fonts.sub)
-        course_id_lb.place(x=0, y=40)
-        course_id_entry = tk.Entry(head_frame, font=programs.fonts.sub)
-        course_id_entry.place(x=110, y=40, width=180)
+        menu_frame = tk.Frame(head_frame)
+        menu_frame.grid(row = 1, column = 0)
+        menu_frame.grid_rowconfigure(0, weight = 1)
+        menu_frame.grid_columnconfigure(0, weight = 1)
 
-        course_name_lb = tk.Label(head_frame, text='Course Name:', font=programs.fonts.sub)
-        course_name_lb.place(x=0, y=80)
-        course_name_entry = tk.Entry(head_frame, font=programs.fonts.sub)
-        course_name_entry.place(x=110, y=80, width=180)
 
-        subject_area_lb = tk.Label(head_frame, text='Subject Area:', font=programs.fonts.sub)
-        subject_area_lb.place(x=0, y=120)
-        subject_area_entry = tk.Entry(head_frame, font=programs.fonts.sub)
-        subject_area_entry.place(x=110, y=120, width=180)
+        entries_frame = ttk.LabelFrame(menu_frame)
+        entries_frame.grid(row = 1, column = 0, sticky="NSEW")
+
+        entries_container = tk.Label(entries_frame)
+        entries_container.grid(row = 0, column = 0, sticky="NSEW")
+
+        course_id_lb = tk.Label(entries_container, text='Course ID:', font=programs.fonts.sub)
+        course_id_lb.grid(row = 0, column = 0)
+        course_id_entry = tk.Entry(entries_container, font=programs.fonts.sub)
+        course_id_entry.grid(row = 0, column = 1, pady = 10)
+
+        course_name_lb = tk.Label(entries_container, text='Course Name:', font=programs.fonts.sub)
+        course_name_lb.grid(row = 1, column = 0)
+        course_name_entry = tk.Entry(entries_container, font=programs.fonts.sub)
+        course_name_entry.grid(row = 1, column = 1, pady = 10)
+
+        subject_area_lb = tk.Label(entries_container, text='Subject Area:', font=programs.fonts.sub)
+        subject_area_lb.grid(row = 2, column = 0)
+        subject_area_entry = tk.Entry(entries_container, font=programs.fonts.sub)
+        subject_area_entry.grid(row = 2, column = 1, pady = 10)
 
 
         # Drop down menu to choose an university or organization
         # --------------------------------------------------------------------------------    
         organizations = self.org_model.select_all()
-        organizations_lb = tk.Label(head_frame, text='Organization:', font=programs.fonts.sub)
-        organizations_lb.place(x=0, y=160)
+        organizations_lb = tk.Label(entries_container, text='Organization:', font=programs.fonts.sub)
+        organizations_lb.grid(row = 3, column = 0, pady = 10)
         options = [
         "Choose an organization",
         ]
@@ -64,97 +76,109 @@ class TrainingProgram(tk.Frame):
 
         op_menu_value = tk.StringVar()
         op_menu_value.set(options[0]) # default value
-        w = tk.OptionMenu(head_frame, op_menu_value, *options)
-        w.place(x=110, y=160, width=180)
+        tk.OptionMenu(entries_container, op_menu_value, *options).grid(row = 3, column = 1, pady = 10)
         # --------------------------------------------------------------------------------   
 
 
-        start_date_lb = tk.Label(head_frame, text='Start Date:', font=programs.fonts.sub)
-        start_date_lb.place(x=0, y=200)
+        start_date_lb = tk.Label(entries_container, text='Start Date:', font=programs.fonts.sub)
+        start_date_lb.grid(row = 4, column = 0)
+        start_date_entry = tk.Entry(entries_container, font=programs.fonts.sub)
+        start_date_entry.grid(row = 4, column = 1, pady = 10)
+        end_date_lb = tk.Label(entries_container, text='End Date:', font=programs.fonts.sub)
+        end_date_lb.grid(row = 5, column = 0)
+        end_date_entry = tk.Entry(entries_container, font=programs.fonts.sub)
+        end_date_entry.grid(row = 5, column = 1, pady = 10)
 
-        start_date_entry = tk.Entry(head_frame, font=programs.fonts.sub)
-        start_date_entry.place(x=110, y=200, width=180)
+        tk.Label(entries_container, text='Day:', font=programs.fonts.sub).grid(row = 6, column = 0, pady = 10)
+        days = [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+        ]
+        day_choice = tk.StringVar()
+        day_choice.set(days[0]) # default value
+        tk.OptionMenu(entries_container, day_choice, *days).grid(row = 6, column = 1, pady = 10)
 
-        end_date_lb = tk.Label(head_frame, text='End Date:', font=programs.fonts.sub)
-        end_date_lb.place(x=0, y=250)
 
-        end_date_entry = tk.Entry(head_frame, font=programs.fonts.sub)
-        end_date_entry.place(x=110, y=250, width=180)
-
-        start_time_lb = tk.Label(head_frame, text='Start Time(e.g 10:45):', font=programs.fonts.sub)
-        start_time_lb.place(x=0, y=300)
-        start_time_entry = tk.Entry(head_frame, font=programs.fonts.sub)
-        start_time_entry.place(x=130, y=300, width=100)
+        start_time_lb = tk.Label(entries_container, text='Start Time(e.g 10:45):', font=programs.fonts.sub)
+        start_time_lb.grid(row = 7, column = 0)
+        start_time_entry = tk.Entry(entries_container, font=programs.fonts.sub)
+        start_time_entry.grid(row = 7, column = 1, pady = 10)
         start_time_type = tk.StringVar()
         start_time_type.set(time_types[0]) # default value
-        start_time_ops = tk.OptionMenu(head_frame, start_time_type, *time_types)
-        start_time_ops.place(x=230, y=300, width=60)
+        start_time_ops = tk.OptionMenu(entries_container, start_time_type, *time_types)
+        start_time_ops.grid(row = 7, column = 2)
 
-        end_time_lb = tk.Label(head_frame, text='End Time(e.g 11:45):', font=programs.fonts.sub)
-        end_time_lb.place(x=0, y=350)
-        end_time_entry = tk.Entry(head_frame, font=programs.fonts.sub)
-        end_time_entry.place(x=130, y=350, width=100)
+        end_time_lb = tk.Label(entries_container, text='End Time(e.g 11:45):', font=programs.fonts.sub)
+        end_time_lb.grid(row = 8, column = 0)
+        end_time_entry = tk.Entry(entries_container, font=programs.fonts.sub)
+        end_time_entry.grid(row = 8, column = 1)
         end_time_type = tk.StringVar()
         end_time_type.set(time_types[0]) # default value
-        end_time_ops = tk.OptionMenu(head_frame, end_time_type, *time_types)
-        end_time_ops.place(x=230, y=350, width=60)
+        end_time_ops = tk.OptionMenu(entries_container, end_time_type, *time_types)
+        end_time_ops.grid(row = 8, column = 2)
 
-        #______________________________Buttons____________________________________________________
-        register_btn = tk.Button(head_frame, text='Register', font=programs.fonts.mid,
+        # #______________________________Buttons____________________________________________________
+        buttons_frame = tk.Label(entries_frame)
+        buttons_frame.grid(row = 9, column = 0, pady = 15)
+
+        register_btn = tk.Button(buttons_frame, text='Register', font=programs.fonts.mid,
                                 command=lambda: self.add_program(record_table, [course_id_entry, course_name_entry, 
                                                                 subject_area_entry, start_date_entry, end_date_entry,
                                                                 start_time_entry, end_time_entry],
                                                                 [start_time_type, end_time_type], op_menu_value))
-        register_btn.place(x=0, y=400)
+        register_btn.grid(row = 0, column = 0, padx = 10)
 
-        update_btn = tk.Button(head_frame, text='Update', font=programs.fonts.mid,
-                            command=lambda: self.update_program(record_table, course_id_entry, course_name_entry, 
-                                                                subject_area_entry, start_date_entry, end_date_entry,
-                                                                start_time_entry, end_time_entry, 
-                                                                start_time_type, end_time_type, op_menu_value))
-        update_btn.place(x=85, y=400)
+        tk.Button(buttons_frame, text='Update', font=programs.fonts.mid,
+                command=lambda: self.update_program(record_table, course_id_entry, course_name_entry, 
+                subject_area_entry, start_date_entry, end_date_entry, start_time_entry, end_time_entry,
+                start_time_type, end_time_type, op_menu_value)).grid(row = 0, column = 1)
 
-        delete_btn = tk.Button(head_frame, text='Delete', font=programs.fonts.mid,
+
+        delete_btn = tk.Button(buttons_frame, text='Delete', font=programs.fonts.mid,
                             command=lambda: self.delete_program(record_table, [course_id_entry, course_name_entry, 
                                                                 subject_area_entry, start_date_entry, end_date_entry,
                                                                 start_time_entry, end_time_entry],
                                                                 start_time_type, end_time_type, op_menu_value))
-        delete_btn.place(x=160, y=400)
+        delete_btn.grid(row = 0, column = 2, padx = 10)
 
-        clear_btn = tk.Button(head_frame, text='Clear', font=programs.fonts.mid,
+        clear_btn = tk.Button(buttons_frame, text='Clear', font=programs.fonts.mid,
                             command=lambda: self.clear_inputs([course_id_entry, course_name_entry, 
                                                                 subject_area_entry, start_date_entry, end_date_entry,
                                                                 start_time_entry, end_time_entry],
                                                                 start_time_type, end_time_type, op_menu_value)
                             )
-        clear_btn.place(x=230, y=400)
+        clear_btn.grid(row = 0, column = 3, padx = 10)
 
-        back_btn = tk.Button(head_frame, text ="Back", font=programs.fonts.mid,
+        back_btn = tk.Button(buttons_frame, text ="Back", font=programs.fonts.mid,
                             command = lambda : self.parent_controller.show_frame('StartPage'))
-        back_btn.place(x=230, y=440)
-        #________________________________Buttons____________________________________________________
+        back_btn.grid(row = 1, column = 3, pady = 5)
+        # #________________________________Buttons____________________________________________________
 
 
-        # Search Section --------------------------------------------------------------------------
-        search_bar_frame = tk.Frame(parent_frame)
-        search_bar_frame.pack(pady=0)
-        search_bar_frame.pack_propagate(False)
-        search_bar_frame.configure(width=450, height=120)
+        # # Search Section --------------------------------------------------------------------------
 
-        search_lb = tk.Label(search_bar_frame,
+        search_frame = ttk.LabelFrame(menu_frame, text="Search")
+        search_frame.grid(row = 1, column = 1, sticky="NSEW")
+
+        search_time_lb = tk.Label(search_frame,
                             text='Search a course/program for a given time window',
                             font=programs.fonts.sub)
-        search_lb.pack(anchor=tk.W)
-        search_from_lb = tk.Label(search_bar_frame, text='From:', font=programs.fonts.sub)
-        search_from_lb.pack(anchor=tk.W)
+        search_time_lb.grid(row = 0, column = 0)
+        time_search_container = tk.Label(search_frame)
+        time_search_container.grid(row = 1, column = 0)
+        search_from_lb = tk.Label(time_search_container, text='From (e.g 10:45):', font=programs.fonts.sub)
+        search_from_lb.grid(row = 0, column = 0)
         # search_from_lb.place(x=0, y=20)
-        search_start_time = tk.Entry(search_bar_frame, font=programs.fonts.sub)
-        search_start_time.place(x=50, y=25, width=50)
+        search_start_time = tk.Entry(time_search_container, font=programs.fonts.sub)
+        search_start_time.grid(row = 0, column = 1)
 
         from_meridiem = tk.StringVar()
         from_meridiem.set(time_types[0]) # default value
-        from_ops = tk.OptionMenu(search_bar_frame, from_meridiem, *time_types)
-        from_ops.place(x=110, y=25, width=60)
+        from_ops = tk.OptionMenu(time_search_container, from_meridiem, *time_types)
+        from_ops.grid(row =0, column = 2)
         search_start_time.bind('<KeyRelease>', lambda e: self.find_program_by_time(record_table, 
                                                                                     search_start_time.get(),
                                                                                     from_meridiem.get(),
@@ -162,14 +186,14 @@ class TrainingProgram(tk.Frame):
                                                                                     to_meridiem.get()
                                                                                     ))
 
-        search_to_lb = tk.Label(search_bar_frame, text='To:', font=programs.fonts.sub)
-        search_to_lb.pack(anchor=tk.W)
-        search_end_time = tk.Entry(search_bar_frame, font=programs.fonts.sub)
-        search_end_time.place(x=50, y=50, width=50)
+        search_to_lb = tk.Label(time_search_container, text='To (e.g 12:45):', font=programs.fonts.sub)
+        search_to_lb.grid(row = 1, column = 0)
+        search_end_time = tk.Entry(time_search_container, font=programs.fonts.sub)
+        search_end_time.grid(row = 1, column = 1)
         to_meridiem = tk.StringVar()
         to_meridiem.set(time_types[1]) # default value
-        to_ops = tk.OptionMenu(search_bar_frame, to_meridiem, *time_types)
-        to_ops.place(x=110, y=50, width=60)
+        to_ops = tk.OptionMenu(time_search_container, to_meridiem, *time_types)
+        to_ops.grid(row = 1, column = 2)
         search_end_time.bind('<KeyRelease>', lambda e: self.find_program_by_time(record_table, 
                                                                                 search_start_time.get(),
                                                                                 from_meridiem.get(),
@@ -177,59 +201,54 @@ class TrainingProgram(tk.Frame):
                                                                                 to_meridiem.get()
                                                                                 ))
 
-
-        search_lb = tk.Label(search_bar_frame,
+        tk.Label(search_frame, text='OR', font=('Bold', 15)).grid(row = 2, column = 0)
+        search_org_lb = tk.Label(search_frame,
                             text='Search a course/program for a specified university or training organization',
                             font=programs.fonts.sub)
-        search_lb.pack(anchor=tk.W, pady=5)
-        search_by_org_entry = tk.Entry(search_bar_frame, font=programs.fonts.sub)
-        search_by_org_entry.pack(anchor=tk.W)
+        search_org_lb.grid(row = 3, column = 0)
+        search_by_org_entry = tk.Entry(search_frame, font=programs.fonts.sub)
+        search_by_org_entry.grid(row = 4, column = 0)
         search_by_org_entry.bind('<KeyRelease>', lambda e: self.find_program_by_org(record_table, search_by_org_entry.get()))
         # Search Section End --------------------------------------------------------------------------
 
+        tk.Label(head_frame,
+                text= 'Select Record for Delete or Update',
+                bg='pink', font=programs.fonts.main).grid(row = 2, column = 0, pady=25)
 
-        record_frame = tk.Frame(parent_frame)
-        record_frame.pack(pady=10)
-        record_frame.pack_propagate(False)
-        record_frame.configure(width=900, height=700)
-
-        record_lb = tk.Label(record_frame, text= 'Select Record for Delete or Update',
-                            bg='pink', font=programs.fonts.main)
-        record_lb.pack(fill=tk.X)
+        record_frame = tk.Frame(head_frame)
+        record_frame.grid(row = 3, column = 0, sticky="NSEW")
 
         record_table = ttk.Treeview(record_frame)
-        record_table.pack(fill=tk.X, pady=5)
+        record_table.grid(row = 0, column = 0, sticky="NSEW")
                             
-        #New___________________________________________________________________
         record_table.bind('<ButtonRelease-1>', lambda e: self.put_into_entries(record_table, course_id_entry, course_name_entry, 
                                                                             subject_area_entry, start_date_entry, end_date_entry,
                                                                             start_time_entry, end_time_entry, start_time_type,
                                                                             end_time_type, op_menu_value))
-        #______________________________________________________________________
 
         record_table['column'] = ['ID', 'Course ID', 'Course Name', 'Subject Area', 'Organization Name', 
                                 'Start Date', 'End Date', 'Start Time', 'End Time']
 
-        record_table.heading('ID', text='ID', anchor=tk.W)
-        record_table.heading('Course ID', text='Course ID', anchor=tk.W)
-        record_table.heading('Course Name', text='Course Name', anchor=tk.W)
-        record_table.heading('Subject Area', text='Subject Area', anchor=tk.W)
-        record_table.heading('Organization Name', text='Organization Name', anchor=tk.W)
-        record_table.heading('Start Date', text='Start Date', anchor=tk.W)
-        record_table.heading('End Date', text='End Date', anchor=tk.W)
-        record_table.heading('Start Time', text='Start Time', anchor=tk.W)
-        record_table.heading('End Time', text='Start Time', anchor=tk.W)
+        record_table.heading('ID', text='ID')
+        record_table.heading('Course ID', text='Course ID')
+        record_table.heading('Course Name', text='Course Name')
+        record_table.heading('Subject Area', text='Subject Area')
+        record_table.heading('Organization Name', text='Organization Name')
+        record_table.heading('Start Date', text='Start Date')
+        record_table.heading('End Date', text='End Date')
+        record_table.heading('Start Time', text='Start Time')
+        record_table.heading('End Time', text='Start Time')
 
         record_table.column('#0', anchor=tk.W, width=0, stretch=tk.NO)
         record_table.column('ID', anchor=tk.W, width=20)
         record_table.column('Course ID', anchor=tk.W, width=60)
-        record_table.column('Course Name', anchor=tk.W, width=150)
-        record_table.column('Subject Area', anchor=tk.W, width=150)
-        record_table.column('Organization Name', anchor=tk.W, width=150)
-        record_table.column('Start Date', anchor=tk.W, width=100)
-        record_table.column('End Date', anchor=tk.W, width=100)
-        record_table.column('Start Time', anchor=tk.W, width=100)
-        record_table.column('End Time', anchor=tk.W, width=100)
+        record_table.column('Course Name', anchor="center")
+        record_table.column('Subject Area', anchor="center")
+        record_table.column('Organization Name', anchor="center")
+        record_table.column('Start Date', anchor="center")
+        record_table.column('End Date', anchor="center")
+        record_table.column('Start Time', anchor="center")
+        record_table.column('End Time', anchor="center")
 
         self.load_data(record_table)
 
