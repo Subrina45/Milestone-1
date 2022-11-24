@@ -144,32 +144,6 @@ class Organizations(tk.Frame):
         back_button.grid(row = row_value, column = 0)
         return frame
 
-# second window frame Courses
-class Courses(tk.Frame):
-    def __init__(self, parent, controller):
-         
-        tk.Frame.__init__(self, parent)
-        label = ttk.Label(self, text ="p1", font = LARGEFONT)
-        label.grid(row = 0, column = 4, padx = 10, pady = 10)
-  
-        # button to show frame 2 with text
-        # layout2
-        button1 = ttk.Button(self, text ="Organizations",
-                            command = lambda : controller.show_frame(Organizations))
-     
-        # putting the button in its place
-        # by using grid
-        button1.grid(row = 1, column = 1, padx = 10, pady = 10)
-  
-        # button to show frame 2 with text
-        # layout2
-        button2 = ttk.Button(self, text ="Page 2",
-                            command = lambda : controller.show_frame(Page2))
-     
-        # putting the button in its place by
-        # using grid
-        button2.grid(row = 2, column = 1, padx = 10, pady = 10)
-
 # Driver Code
 app = tkinterApp()
 app.mainloop()
