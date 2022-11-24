@@ -38,6 +38,7 @@ class TrainingProgramModel:
                         subject_area TEXT NOT NULL,
                         start_date TEXT NOT NULL,
                         end_date TEXT NOT NULL,
+                        day TEXT NOT NULL,
                         start_time TEXT NOT NULL,
                         start_time_type TEXT NOT NULL,
                         end_time TEXT NOT NULL,
@@ -47,6 +48,7 @@ class TrainingProgramModel:
         self.close_connection(conn)
 
     def add_trainingProgram(self, trainingProgram):
+        print('add_trainingProgram Called')
         """
         Create a new trainingProgram into the trainingProgram table
         :param trainingProgram:
@@ -57,10 +59,11 @@ class TrainingProgramModel:
                 INSERT INTO TrainingProgram(course_id, course_name,
                                             subject_area,
                                             start_date, end_date,
+                                            day,
                                             start_time, start_time_type,
                                             end_time, end_time_type,
                                             organization_id)
-                VALUES(?,?,?,?,?,?,?,?,?,?)
+                VALUES(?,?,?,?,?,?,?,?,?,?,?)
             '''
         cur = conn.cursor()
         cur.execute(sql, trainingProgram)
@@ -73,7 +76,8 @@ class TrainingProgramModel:
         """
         update course_id, course_name, 
                 subject_area, start_date, 
-                end_date, start_time, start_time_type,
+                end_date, start_time, day,
+                start_time_type,
                 end_time, end_time_type, and
                 organization_id of trainingProgram
         :param trainingProgram:
@@ -85,6 +89,7 @@ class TrainingProgramModel:
                     subject_area = ? ,
                     start_date = ? ,
                     end_date = ? ,
+                    day = ? ,
                     start_time = ? ,
                     start_time_type = ? ,
                     end_time = ? ,
@@ -104,7 +109,24 @@ class TrainingProgramModel:
         """
         conn = self.create_connection()
         cur = conn.cursor()
-        cur.execute("SELECT TrainingProgram.*, organizations.name FROM TrainingProgram JOIN organizations ON organizations.id = TrainingProgram.organization_id")
+        cur.execute("""
+                    SELECT 
+                        TrainingProgram.id,
+                        TrainingProgram.course_id,
+                        TrainingProgram.subject_area,
+                        TrainingProgram.course_name,
+                        organizations.name,
+                        TrainingProgram.start_date,
+                        TrainingProgram.end_date,
+                        TrainingProgram.day,
+                        TrainingProgram.start_time,
+                        TrainingProgram.start_time_type,
+                        TrainingProgram.end_time,
+                        TrainingProgram.end_time_type
+                    FROM TrainingProgram
+                    JOIN organizations
+                    ON organizations.id = TrainingProgram.organization_id"""
+                )
         rows = cur.fetchall()
         self.close_connection(conn)
         return rows
