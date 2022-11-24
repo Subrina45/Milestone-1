@@ -176,10 +176,10 @@ class TrainingProgramModel:
                     JOIN organizations 
                     ON organizations.id = TrainingProgram.organization_id
                     WHERE
-                        TrainingProgram.start_time LIKE ?
+                        TrainingProgram.start_time >= ?
                     AND
-                        TrainingProgram.end_time LIKE ?
-                    """, ('%' + start_time + '%','%' + end_time + '%'))
+                        TrainingProgram.end_time <= ?
+                    """, (start_time, end_time))
         rows = cur.fetchall()
         self.close_connection(conn)
         return rows
