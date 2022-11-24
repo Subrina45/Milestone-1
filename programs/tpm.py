@@ -173,7 +173,19 @@ class TrainingProgramModel:
         conn = self.create_connection()
         cur = conn.cursor()
         cur.execute("""
-                    SELECT TrainingProgram.*, organizations.name
+                    SELECT
+                        TrainingProgram.id,
+                        TrainingProgram.course_id,
+                        TrainingProgram.subject_area,
+                        TrainingProgram.course_name,
+                        organizations.name,
+                        TrainingProgram.start_date,
+                        TrainingProgram.end_date,
+                        TrainingProgram.day,
+                        TrainingProgram.start_time,
+                        TrainingProgram.start_time_type,
+                        TrainingProgram.end_time,
+                        TrainingProgram.end_time_type
                     FROM TrainingProgram
                     JOIN organizations 
                     ON organizations.id = TrainingProgram.organization_id
@@ -193,7 +205,19 @@ class TrainingProgramModel:
         conn = self.create_connection()
         cur = conn.cursor()
         cur.execute("""
-                    SELECT TrainingProgram.*, organizations.name
+                    SELECT
+                        TrainingProgram.id,
+                        TrainingProgram.course_id,
+                        TrainingProgram.subject_area,
+                        TrainingProgram.course_name,
+                        organizations.name,
+                        TrainingProgram.start_date,
+                        TrainingProgram.end_date,
+                        TrainingProgram.day,
+                        TrainingProgram.start_time,
+                        TrainingProgram.start_time_type,
+                        TrainingProgram.end_time,
+                        TrainingProgram.end_time_type
                     FROM TrainingProgram
                     JOIN organizations 
                     ON organizations.id = TrainingProgram.organization_id
