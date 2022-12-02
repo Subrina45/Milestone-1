@@ -1,6 +1,7 @@
 import tkinter as tk
 import os
 from mentorPreference.initial import StartPage
+from mentorPreference.dashboard import MentorDashboard
 from mentors.mm import MentorsModel
 
 
@@ -24,10 +25,13 @@ class tkinterApp(tk.Tk):
         if len(record) == 1: # if the record is found, proceed to the menu
             self.set_credentials(record[0])
             self.set_authenticated(True)
-            self.show_frame('MentorMenu')
+            self.show_frame('MentorDashboard')
         else:
             print('invalid credentials')
-            tk.Label(self, text='Invalid credentials, please try again', font=10).pack()
+            tk.Label(self.frame, text ='Invalid credentials, please try again').grid(row=self.frame.return_last_main_frame_row(),column=0)
+            # top = tk.Toplevel()
+            # top.title("Unauthorized")
+            # tk.Label(top, text ='Invalid credentials, please try again').grid(row=0,column=0)
 
     def show_frame(self, class_name):
         """ Displays requested menu based on authenticated status
@@ -40,7 +44,7 @@ class tkinterApp(tk.Tk):
             class_name (string): Name of a class that contains the logic for 
             constructing a requested menu
         """
-        if self.is_authenticated == False: # if a user is authenticated display StartPage
+        if self.is_authenticated == False: # if a user is not authenticated display StartPage
             self.frame.destroy()
             self.frame = eval('StartPage')(self)
         else:
