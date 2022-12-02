@@ -34,7 +34,7 @@ class tkinterApp(tk.Tk):
             # tk.Label(top, text ='Invalid credentials, please try again').grid(row=0,column=0)
 
     def show_frame(self, class_name):
-        """ Displays requested menu based on authenticated status
+        """ Displays a requested menu based on the authentication status
 
 
         If a user is not authenticated, the display defaults to the StartPage.
@@ -67,9 +67,9 @@ class tkinterApp(tk.Tk):
         return self.credentials
 
     def get_db_path(self):
-        """Returns value of db_path property
+        """Returns the value of db_path property
 
-        Returns the path the database
+        Returns the path to the database
         """
         return self.db_path
 
