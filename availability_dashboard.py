@@ -1,7 +1,6 @@
 import tkinter as tk
 import os
-from mentorPreference.index import StartPage
-from mentorPreference.mm import MentorMenu
+from mentorPreference.initial import StartPage
 from mentors.mm import MentorsModel
 
 
