@@ -60,6 +60,9 @@ class tkinterApp(tk.Tk):
     def set_credentials(self, credentials):
         self.credentials = credentials
 
+    def get_credentials(self):
+        return self.credentials
+
     def get_db_path(self):
         """Returns value of db_path property
 
