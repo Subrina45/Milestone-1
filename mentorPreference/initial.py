@@ -48,3 +48,6 @@ class StartPage(tk.Frame):
         submit_btn = ttk.Button(menu_frame, text="Submit", command = lambda : self.parent.submit_login(id, first_name, last_name))
         submit_btn.grid(row = self.main_frame_row, column = 0, pady=15)
         self.increment_main_frame_row()
+
+    def return_last_main_frame_row(self):
+        return self.main_frame_row
