@@ -231,22 +231,35 @@ class MentorDashboard(tk.Frame):
 
     def search_for_courses(self, record_table, time_info, subject_area):
         selected_days = time_info['selected_days']
+        start_date = time_info['start_date'].strip()
+        end_date = time_info['end_date'].strip()
         start_time = time_info['start_time']
         end_time = time_info['end_time']
         start_type = time_info['start_type']
         end_type = time_info['end_type']
 
+        # if a date or time is invalid, use a default value or ignore it
         courses = [] # by default found courses are empty
-        if len(start_time) > 4 or len(end_time) > 4:
+        if len(start_time) == 5 or len(end_time) == 5:
             start_formatted = self.time_con.format_unixtimestamp('08:00', 'AM') # 08:00AM - minimum starting time
             end_formatted = self.time_con.format_unixtimestamp('09:00', 'PM') # 09:00PM - maximum ending time
-            if len(start_time) > 4: # use passed start time if entered fully - e.x. 10:45,
+            if len(start_time) == 5: # use passed start time if entered fully - e.x. 10:45,
                 start_formatted = self.time_con.format_unixtimestamp(start_time, start_type)
-            if len(end_time) > 4: # use passed end time if entered fully - e.x. 10:45,
+            if len(end_time) == 5: # use passed end time if entered fully - e.x. 10:45,
                 end_formatted = self.time_con.format_unixtimestamp(end_time, end_type)
+            if len(start_date) == 10: # mm/dd/yyyy <--- has ten characters
+                start_date = str(self.time_con.date_to_unixtimestamp(start_date))
+            else: #if not ten characters, assign an empty str
+                start_date = ''
+            if len(end_date) == 10: # mm/dd/yyyy <--- has ten characters
+                end_date = str(self.time_con.date_to_unixtimestamp(end_date))
+            else: #if not ten characters, assign an empty str
+                end_date = ''
 
             # get matched courses from the db
             courses = self.program_model.select_by_time_sub_area({'selected_days': selected_days,
+                                                                'start_date': start_date,
+                                                                'end_date': end_date,
                                                                 'start_time': start_formatted,
                                                                 'end_time': end_formatted}
                                                                 ,subject_area)
