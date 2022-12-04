@@ -1,11 +1,10 @@
-from datetime import datetime
-from time import mktime
 import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk, Image
 from programs.tpm import TrainingProgramModel
 from mentorPreference.model import MentorPreferenceModel
 import mentorPreference.fonts
+from timeconverter.converter import TimeConverter
 
 class MentorDashboard(tk.Frame):
 
@@ -15,6 +14,7 @@ class MentorDashboard(tk.Frame):
         self.grid_rowconfigure(0, weight = 1)
         self.grid_columnconfigure(0, weight = 1)
         self.parent_controller = parent
+        self.time_con = TimeConverter()
         self.program_model = TrainingProgramModel(r"" + parent.get_db_path())
         self.mentor_prf_model = MentorPreferenceModel(r"" + parent.get_db_path())
         self.im_checked = ImageTk.PhotoImage(Image.open('checked.png'))
@@ -210,14 +210,6 @@ class MentorDashboard(tk.Frame):
         for element in entries:
             element.config(state= "disable")
 
-    def format_unixtimestamp(self, time, time_type):
-        dt = datetime.strptime(time + ' ' + time_type, "%I:%M %p")
-        dt = dt.replace(1970, 1, 1)
-        return int(mktime(dt.timetuple()))
-
-    def format_humanreadable(self, timestamp, include_type = True):
-        return datetime.fromtimestamp(int(timestamp)).strftime('%I:%M %p' if include_type else '%I:%M')
-
     def populate_record_table(self, record_table, programs):
         for item in record_table.get_children():
             record_table.delete(item)
@@ -226,8 +218,12 @@ class MentorDashboard(tk.Frame):
             program_copy = list(programs[r]).copy()
             program_copy.pop(-1) # remove end time type
             program_copy.pop(-2) # remove start time type
-            start_time = self.format_humanreadable(program_copy[-2])
-            end_time = self.format_humanreadable(program_copy[-1])
+            start_day = self.time_con.unixtimestamp_to_date(program_copy[-5]) # start date
+            end_day = self.time_con.unixtimestamp_to_date(program_copy[-4]) # end date
+            start_time = self.time_con.format_humanreadable(program_copy[-2])
+            end_time = self.time_con.format_humanreadable(program_copy[-1])
+            program_copy[-5] = start_day
+            program_copy[-4] = end_day
             program_copy[-2] = start_time
             program_copy[-1] = end_time
             record_table.insert(parent='', index='end',
@@ -242,12 +238,12 @@ class MentorDashboard(tk.Frame):
 
         courses = [] # by default found courses are empty
         if len(start_time) > 4 or len(end_time) > 4:
-            start_formatted = self.format_unixtimestamp('08:00', 'AM') # 08:00AM - minimum starting time
-            end_formatted = self.format_unixtimestamp('09:00', 'PM') # 09:00PM - maximum ending time
+            start_formatted = self.time_con.format_unixtimestamp('08:00', 'AM') # 08:00AM - minimum starting time
+            end_formatted = self.time_con.format_unixtimestamp('09:00', 'PM') # 09:00PM - maximum ending time
             if len(start_time) > 4: # use passed start time if entered fully - e.x. 10:45,
-                start_formatted = self.format_unixtimestamp(start_time, start_type)
+                start_formatted = self.time_con.format_unixtimestamp(start_time, start_type)
             if len(end_time) > 4: # use passed end time if entered fully - e.x. 10:45,
-                end_formatted = self.format_unixtimestamp(end_time, end_type)
+                end_formatted = self.time_con.format_unixtimestamp(end_time, end_type)
 
             # get matched courses from the db
             courses = self.program_model.select_by_time_sub_area({'selected_days': selected_days,
