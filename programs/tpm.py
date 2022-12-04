@@ -247,35 +247,50 @@ class TrainingProgramModel:
         sql_values.append(time_obj['end_time'])
         sql_values.append(sub_area)
 
+        # if a value for the start date is passed, add an appropriate sql condition
+        start_date_filter = ''
+        if time_obj['start_date'] != '':
+            start_date_filter = 'AND TrainingProgram.start_date >= ?'
+            sql_values.append(time_obj['start_date'])
+
+        # if a value for the end date is passed, add an appropriate sql condition
+        end_date_filter = ''
+        if time_obj['end_date'] != '':
+            end_date_filter = 'AND TrainingProgram.end_date <= ?'
+            sql_values.append(time_obj['end_date'])
+
+        query = """
+                SELECT
+                    TrainingProgram.id,
+                    TrainingProgram.course_id,
+                    TrainingProgram.subject_area,
+                    TrainingProgram.course_name,
+                    organizations.name,
+                    TrainingProgram.start_date,
+                    TrainingProgram.end_date,
+                    TrainingProgram.day,
+                    TrainingProgram.start_time,
+                    TrainingProgram.start_time_type,
+                    TrainingProgram.end_time,
+                    TrainingProgram.end_time_type
+                FROM TrainingProgram
+                JOIN organizations
+                ON organizations.id = TrainingProgram.organization_id
+                WHERE
+                    TrainingProgram.day IN ({})
+                AND
+                    TrainingProgram.start_time >= ?
+                AND
+                    TrainingProgram.end_time <= ?
+                AND
+                    TrainingProgram.subject_area = ?
+                """.format(','.join('?' for day in time_obj['selected_days']))
+        query += start_date_filter
+        query += end_date_filter
+
         conn = self.create_connection()
         cur = conn.cursor()
-        cur.execute("""
-                    SELECT
-                        TrainingProgram.id,
-                        TrainingProgram.course_id,
-                        TrainingProgram.subject_area,
-                        TrainingProgram.course_name,
-                        organizations.name,
-                        TrainingProgram.start_date,
-                        TrainingProgram.end_date,
-                        TrainingProgram.day,
-                        TrainingProgram.start_time,
-                        TrainingProgram.start_time_type,
-                        TrainingProgram.end_time,
-                        TrainingProgram.end_time_type
-                    FROM TrainingProgram
-                    JOIN organizations 
-                    ON organizations.id = TrainingProgram.organization_id
-                    WHERE
-                        TrainingProgram.day IN ({})
-                    AND
-                        TrainingProgram.start_time >= ?
-                    AND
-                        TrainingProgram.end_time <= ?
-                    AND
-                        TrainingProgram.subject_area = ?
-                    """.format(','.join('?' for day in time_obj['selected_days'])), # should pass as many '?' to sql query as many days is selected
-                    tuple(sql_values))
+        cur.execute(query, tuple(sql_values))
         rows = cur.fetchall()
         self.close_connection(conn)
         return rows
