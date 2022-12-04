@@ -266,15 +266,13 @@ class TrainingProgram(tk.Frame):
 
     def put_into_entries(self, record_table, course_id_entry, course_name_entry,
                         subject_area_entry, start_date_entry, end_date_entry,
-                        start_time_entry, end_time_entry, 
-                        day,
+                        start_time_entry, end_time_entry, day,
                         start_time_type, end_time_type, op_menu_value):
         curItem = record_table.focus()
         values = record_table.item(curItem)['values']
         program_id = values[0]
 
         program = self.model.select_program_by_id(program_id)[0]
-        print('put_into_entries', program)
 
         course_id_entry.delete(0, tk.END)
         course_name_entry.delete(0, tk.END)
@@ -287,8 +285,8 @@ class TrainingProgram(tk.Frame):
         course_id = program[1]
         course_name = program[2]
         sub_area = program[3]
-        stat_date = program[4]
-        end_date = program[5]
+        stat_date = self.time_con.unixtimestamp_to_date(program[4])
+        end_date = self.time_con.unixtimestamp_to_date(program[5])
         day_value = program[6]
         start_time = self.time_con.format_humanreadable(program[7], False)
         start_t_type = program[8]
@@ -320,14 +318,16 @@ class TrainingProgram(tk.Frame):
         values = []
         organization_id = self.org_model.select_by_name(org_option.get())[0][0]
 
+        start_date = self.time_con.date_to_unixtimestamp(elements[3].get())
+        end_date = self.time_con.date_to_unixtimestamp(elements[4].get())
         start_time = self.time_con.format_unixtimestamp(elements[5].get(), time_types[0].get())
         end_time = self.time_con.format_unixtimestamp(elements[6].get(), time_types[1].get())
 
         values.append(elements[0].get())
         values.append(elements[1].get())
         values.append(elements[2].get())
-        values.append(elements[3].get())
-        values.append(elements[4].get())
+        values.append(start_date)
+        values.append(end_date)
         values.append(day.get())
         values.append(start_time)
         values.append(time_types[0].get())
@@ -348,14 +348,16 @@ class TrainingProgram(tk.Frame):
         cur_item = record_table.focus()
         program_id = record_table.item(cur_item)['values'][0]
         organization_id = self.org_model.select_by_name(op_menu_value.get())[0][0]
+        start_date = self.time_con.date_to_unixtimestamp(start_date_entry.get())
+        end_date = self.time_con.date_to_unixtimestamp(end_date_entry.get())
         start_time = self.time_con.format_unixtimestamp(start_time_entry.get(), start_time_type.get())
         end_time = self.time_con.format_unixtimestamp(end_time_entry.get(), end_time_type.get())
         values = []
         values.append(course_id_entry.get())
         values.append(course_name_entry.get())
         values.append(subject_area_entry.get())
-        values.append(start_date_entry.get())
-        values.append(end_date_entry.get())
+        values.append(start_date)
+        values.append(end_date)
         values.append(day.get())
         values.append(start_time)
         values.append(start_time_type.get())
@@ -389,8 +391,13 @@ class TrainingProgram(tk.Frame):
             program_copy = list(programs[r]).copy()
             program_copy.pop(-1) # remove end time type
             program_copy.pop(-2) # remove start time type
-            start_time = self.time_con.format_humanreadable(program_copy[-2])
-            end_time = self.time_con.format_humanreadable(program_copy[-1])
+            print(program_copy)
+            start_day = self.time_con.unixtimestamp_to_date(program_copy[-5]) # start date
+            end_day = self.time_con.unixtimestamp_to_date(program_copy[-4]) # end date
+            start_time = self.time_con.format_humanreadable(program_copy[-2]) # start time
+            end_time = self.time_con.format_humanreadable(program_copy[-1]) #end time
+            program_copy[-5] = start_day
+            program_copy[-4] = end_day
             program_copy[-2] = start_time
             program_copy[-1] = end_time
             record_table.insert(parent='', index='end', text='',
