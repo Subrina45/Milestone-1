@@ -1,10 +1,9 @@
-from datetime import datetime
-from time import mktime
 import tkinter as tk
 from tkinter import ttk
 from programs.tpm import TrainingProgramModel
 from organizations.om import OrganizationsModel
 import programs.fonts
+from timeconverter.converter import TimeConverter
 
 class TrainingProgram(tk.Frame):
 
@@ -13,6 +12,7 @@ class TrainingProgram(tk.Frame):
         self.pack(side = "top", fill = "both", expand = True)
         self.grid_rowconfigure(0, weight = 1)
         self.grid_columnconfigure(0, weight = 1)
+        self.time_con = TimeConverter()
         self.parent_controller = parent
         self.model = TrainingProgramModel(r"" + parent.get_db_path())
         self.org_model = OrganizationsModel(r"" + parent.get_db_path())
@@ -290,9 +290,9 @@ class TrainingProgram(tk.Frame):
         stat_date = program[4]
         end_date = program[5]
         day_value = program[6]
-        start_time = self.format_humanreadable(program[7], False)
+        start_time = self.time_con.format_humanreadable(program[7], False)
         start_t_type = program[8]
-        end_time = self.format_humanreadable(program[9], False)
+        end_time = self.time_con.format_humanreadable(program[9], False)
         end_t_type = program[10]
         org_name = program[-1]
 
@@ -320,8 +320,8 @@ class TrainingProgram(tk.Frame):
         values = []
         organization_id = self.org_model.select_by_name(org_option.get())[0][0]
 
-        start_time = self.format_unixtimestamp(elements[5].get(), time_types[0].get())
-        end_time = self.format_unixtimestamp(elements[6].get(), time_types[1].get())
+        start_time = self.time_con.format_unixtimestamp(elements[5].get(), time_types[0].get())
+        end_time = self.time_con.format_unixtimestamp(elements[6].get(), time_types[1].get())
 
         values.append(elements[0].get())
         values.append(elements[1].get())
@@ -348,8 +348,8 @@ class TrainingProgram(tk.Frame):
         cur_item = record_table.focus()
         program_id = record_table.item(cur_item)['values'][0]
         organization_id = self.org_model.select_by_name(op_menu_value.get())[0][0]
-        start_time = self.format_unixtimestamp(start_time_entry.get(), start_time_type.get())
-        end_time = self.format_unixtimestamp(end_time_entry.get(), end_time_type.get())
+        start_time = self.time_con.format_unixtimestamp(start_time_entry.get(), start_time_type.get())
+        end_time = self.time_con.format_unixtimestamp(end_time_entry.get(), end_time_type.get())
         values = []
         values.append(course_id_entry.get())
         values.append(course_name_entry.get())
@@ -381,14 +381,6 @@ class TrainingProgram(tk.Frame):
         self.load_data(record_table)
         self.clear_inputs(elements, day, start_time_type, end_time_type, op_menu_value)
 
-    def format_unixtimestamp(self, time, time_type):
-        dt = datetime.strptime(time + ' ' + time_type, "%I:%M %p")
-        dt = dt.replace(1970, 1, 1)
-        return int(mktime(dt.timetuple()))
-
-    def format_humanreadable(self, timestamp, include_type = True):
-        return datetime.fromtimestamp(int(timestamp)).strftime('%I:%M %p' if include_type else '%I:%M')
-
     def populate_record_table(self, record_table, programs):
         for item in record_table.get_children():
             record_table.delete(item)
@@ -397,8 +389,8 @@ class TrainingProgram(tk.Frame):
             program_copy = list(programs[r]).copy()
             program_copy.pop(-1) # remove end time type
             program_copy.pop(-2) # remove start time type
-            start_time = self.format_humanreadable(program_copy[-2])
-            end_time = self.format_humanreadable(program_copy[-1])
+            start_time = self.time_con.format_humanreadable(program_copy[-2])
+            end_time = self.time_con.format_humanreadable(program_copy[-1])
             program_copy[-2] = start_time
             program_copy[-1] = end_time
             record_table.insert(parent='', index='end', text='',
@@ -413,12 +405,12 @@ class TrainingProgram(tk.Frame):
 
     def find_program_by_time(self, record_table, start_time, start_type, end_time, end_type):
         if len(start_time) > 4 or len(end_time) > 4:
-            start_formatted = self.format_unixtimestamp('08:00', 'AM') # 08:00AM - minimum starting time
-            end_formatted = self.format_unixtimestamp('09:00', 'PM') # 09:00PM - maximum ending time
+            start_formatted = self.time_con.format_unixtimestamp('08:00', 'AM') # 08:00AM - minimum starting time
+            end_formatted = self.time_con.format_unixtimestamp('09:00', 'PM') # 09:00PM - maximum ending time
             if len(start_time) > 4: # use passed start time if entered fully - e.x. 10:45,
-                start_formatted = self.format_unixtimestamp(start_time, start_type)
+                start_formatted = self.time_con.format_unixtimestamp(start_time, start_type)
             if len(end_time) > 4: # use passed end time if entered fully - e.x. 10:45,
-                end_formatted = self.format_unixtimestamp(end_time, end_type)
+                end_formatted = self.time_con.format_unixtimestamp(end_time, end_type)
             programs = self.model.select_program_by_time(start_formatted, end_formatted)
             self.populate_record_table(record_table, programs)
         else:
