@@ -2,9 +2,10 @@ from datetime import datetime
 from time import mktime
 import tkinter as tk
 from tkinter import ttk
-import mentorPreference.fonts
-from programs.tpm import TrainingProgramModel
 from PIL import ImageTk, Image
+from programs.tpm import TrainingProgramModel
+from mentorPreference.model import MentorPreferenceModel
+import mentorPreference.fonts
 
 class MentorDashboard(tk.Frame):
 
@@ -15,6 +16,7 @@ class MentorDashboard(tk.Frame):
         self.grid_columnconfigure(0, weight = 1)
         self.parent_controller = parent
         self.program_model = TrainingProgramModel(r"" + parent.get_db_path())
+        self.mentor_prf_model = MentorPreferenceModel(r"" + parent.get_db_path())
         self.im_checked = ImageTk.PhotoImage(Image.open('checked.png'))
         self.im_unchecked = ImageTk.PhotoImage(Image.open('unchecked.png'))
         self.construct_frame()
@@ -189,11 +191,9 @@ class MentorDashboard(tk.Frame):
         submit_btn = tk.Button(submit_selection_lb,
                                 text='Submit',
                                 font=mentorPreference.fonts.sub,
-                                command=lambda: self.search_for_courses(record_table,
-                                                                    selected_course_ids,
-                                                                    self.parent_controller.get_credentials()[-2] # mentor's subject area
-                                                                    ))
-        submit_btn.grid(row = 0, column = 0)
+                                command=lambda: self.submit_selections(selected_course_ids,
+                                                                        self.parent_controller.get_credentials()[0]))
+        submit_btn.grid(row = 1, column = 0)
 
         return head_frame
         # end of construct_frame method ---------
@@ -289,3 +289,6 @@ class MentorDashboard(tk.Frame):
         else:
             record_table.item(row, tags='checked')
             record_table.item(row, image=self.im_checked)
+
+    def submit_selections(self, course_ids, mentor_id):
+        self.mentor_prf_model.add(course_ids, mentor_id)
