@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from mentors.mm import MentorsModel
+from subjects.fms import subjectsModel
 import mentors.fonts
 
 class Mentors(tk.Frame):
@@ -12,6 +13,7 @@ class Mentors(tk.Frame):
         self.grid_columnconfigure(0, weight = 1)
         self.parent_controller = parent
         self.model = MentorsModel(r"" + parent.get_db_path())
+        self.subj_model = subjectsModel(r"" + parent.get_db_path())
         self.container = self.get_initial_frame(self)
 
     def get_initial_frame(self, parent_frame):
@@ -51,13 +53,28 @@ class Mentors(tk.Frame):
 
         subject_area_lb = tk.Label(head_frame, text='Subject Area:', font=mentors.fonts.sub)
         subject_area_lb.place(x=0, y=300)
+        # subject_area = tk.Entry(head_frame, font=mentors.fonts.sub)
+        # subject_area.place(x=110, y=300, width=180)
+        # Drop down menu to choose an university or organization
+        # --------------------------------------------------------------------------------    
+        subject_area = self.subj_model.select_all()
+        subject_area_lb = tk.Label(head_frame, text='Subject Area:', font=mentors.fonts.sub)
+        subject_area_lb.place(x=0, y=300)
+        subj_options = [
+        "Choose a Subject area",
+        ]
 
-        subject_area = tk.Entry(head_frame, font=mentors.fonts.sub)
-        subject_area.place(x=110, y=300, width=180)
+        for subject in subject_area:
+            subj_options.append(subject[1])
+
+        subj_menu_value = tk.StringVar()
+        subj_menu_value.set(subj_options[0]) # default value
+        tk.OptionMenu(head_frame, subj_menu_value, *subj_options).place(x=110, y=295, width=185)
+
+        # ----------------------------------------------------------------------------------
 
         current_employer_lb = tk.Label(head_frame, text='Current Employer:', font=mentors.fonts.sub)
         current_employer_lb.place(x=0, y=350)
-
         current_employer = tk.Entry(head_frame, font=mentors.fonts.sub)
         current_employer.place(x=110, y=350, width=180)
 
