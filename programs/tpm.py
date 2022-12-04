@@ -229,3 +229,53 @@ class TrainingProgramModel:
         rows = cur.fetchall()
         self.close_connection(conn)
         return rows
+
+    def select_by_time_sub_area(self, time_obj, sub_area):
+        print('time_obj', time_obj)
+        """
+        Search for courser/programs by matching the time and subject area
+        param time_obj: a dictionary containing information with days and times
+        param subject_area:
+        return: list
+        """
+
+        sql_values = []
+        for day in time_obj['selected_days']:
+            sql_values.append(day)
+
+        sql_values.append(time_obj['start_time'])
+        sql_values.append(time_obj['end_time'])
+        sql_values.append(sub_area)
+
+        conn = self.create_connection()
+        cur = conn.cursor()
+        cur.execute("""
+                    SELECT
+                        TrainingProgram.id,
+                        TrainingProgram.course_id,
+                        TrainingProgram.subject_area,
+                        TrainingProgram.course_name,
+                        organizations.name,
+                        TrainingProgram.start_date,
+                        TrainingProgram.end_date,
+                        TrainingProgram.day,
+                        TrainingProgram.start_time,
+                        TrainingProgram.start_time_type,
+                        TrainingProgram.end_time,
+                        TrainingProgram.end_time_type
+                    FROM TrainingProgram
+                    JOIN organizations 
+                    ON organizations.id = TrainingProgram.organization_id
+                    WHERE
+                        TrainingProgram.day IN ({})
+                    AND
+                        TrainingProgram.start_time >= ?
+                    AND
+                        TrainingProgram.end_time <= ?
+                    AND
+                        TrainingProgram.subject_area = ?
+                    """.format(','.join('?' for day in time_obj['selected_days'])), # should pass as many '?' to sql query as many days is selected
+                    tuple(sql_values))
+        rows = cur.fetchall()
+        self.close_connection(conn)
+        return rows
