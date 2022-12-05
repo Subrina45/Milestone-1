@@ -83,11 +83,13 @@ class MentorPreferenceModel:
                         mentors.last_name,
                         mentors.email,
                         mentors.cell_phone,
-                        mentors.subject_area,
+                        subjects.subject_area,
                         mentors.current_employer
                     FROM mentor_preferences
-                    JOIN mentors 
+                    JOIN mentors
                     ON mentors.id = mentor_preferences.mentor_id
+                    JOIN subjects
+                    ON subjects.id = mentors.subject_area_id
                     WHERE mentor_preferences.program_id = ?
                     """,
                     (course_id,))
