@@ -64,6 +64,7 @@ class MentorPreferenceModel:
         cur.execute(sql, tuple(values))
         conn.commit()
         self.close_connection(conn)
+        return cur.rowcount
 
     def select_by_course_id(self, course_id):
         """

@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 from PIL import ImageTk, Image
 from programs.tpm import TrainingProgramModel
 from mentorPreference.model import MentorPreferenceModel
@@ -194,7 +195,18 @@ class MentorDashboard(tk.Frame):
                                 text='Submit',
                                 font=mentorPreference.fonts.sub,
                                 command=lambda: self.submit_selections(selected_course_ids,
-                                                                        self.parent_controller.get_credentials()[0]))
+                                                                        self.parent_controller.get_credentials()[0],
+                                                                        record_table,
+                                                                        {
+                                                                            'selected_days': day_list,
+                                                                            'start_time': start_time_entry.get(),
+                                                                            'start_type': from_meridiem.get(),
+                                                                            'end_time': end_time_entry.get(),
+                                                                            'end_type': to_meridiem.get(),
+                                                                            'start_date': start_date.get(),
+                                                                            'end_date': end_date.get()
+                                                                        },
+                                                                        self.parent_controller.get_credentials()[-2]))
         submit_btn.grid(row = 1, column = 0)
 
         return head_frame
@@ -336,5 +348,8 @@ class MentorDashboard(tk.Frame):
             record_table.item(row, tags='checked')
             record_table.item(row, image=self.im_checked)
 
-    def submit_selections(self, course_ids, mentor_id):
-        self.mentor_prf_model.add(course_ids, mentor_id)
+    def submit_selections(self, course_ids, mentor_id, record_table, time_info, subject_area):
+        row_count = self.mentor_prf_model.add(course_ids, mentor_id)
+        if row_count > 0:
+            messagebox.showinfo("Successful", "Your preferences have been submitted")
+            self.search_for_courses(record_table, time_info, subject_area)
