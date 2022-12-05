@@ -59,7 +59,7 @@ class OrganizationDashboard(tk.Frame):
         tk.OptionMenu(menu_frame,
                     org_name,
                     *org_options,
-                    command=lambda e:self.submit_org_choice(org_name.get(), course_table)).grid(row = 0, column = 1, pady = 10)        
+                    command=lambda e:self.submit_org_choice(org_name.get(), course_table, mentor_prfs_table)).grid(row = 0, column = 1, pady = 10)        
         ## Menu Section End --------------------------------------------------------------------------
 
         # COURSE TABLE section start -----------------------------------------------
@@ -101,7 +101,7 @@ class OrganizationDashboard(tk.Frame):
         course_table.column('End Date', anchor="center", width=110)
         course_table.column('Start Time', anchor="center", width=90)
         course_table.column('End Time', anchor="center", width=90)
-        course_table.bind('<ButtonRelease-1>', lambda e: self.handle_course_sel(e, course_table, mentor_table))
+        course_table.bind('<ButtonRelease-1>', lambda e: self.handle_course_sel(e, course_table, mentor_prfs_table))
         # COURSE TABLE section end -----------------------------------------------
 
         tk.Label(head_frame,
@@ -112,31 +112,31 @@ class OrganizationDashboard(tk.Frame):
         mentor_frame = tk.Label(head_frame)
         mentor_frame.grid(row = 5, column = 0)
 
-        mentor_table = ttk.Treeview(mentor_frame,
+        mentor_prfs_table = ttk.Treeview(mentor_frame,
                                     columns=['Mentor Id', 'First Name', 'Last Name', 'Mentor Email',
                                         'Cell Phone', 'Subject Area', 'Current Employer'])
-        mentor_t_style = ttk.Style(mentor_table)
+        mentor_t_style = ttk.Style(mentor_prfs_table)
         mentor_t_style.configure('TreeView', background=[('selected', 'lightgrey')], foreground=[('selected', 'black')])
-        mentor_table.grid(row = 0, column = 0, sticky="NSEW")
+        mentor_prfs_table.grid(row = 0, column = 0, sticky="NSEW")
 
-        mentor_table.heading('#0', text='Approve')
-        mentor_table.heading('Mentor Id', text='Mentor Id')
-        mentor_table.heading('First Name', text='First Name')
-        mentor_table.heading('Last Name', text='Last Name')
-        mentor_table.heading('Mentor Email', text='Mentor Email')
-        mentor_table.heading('Cell Phone', text='Cell Phone')
-        mentor_table.heading('Subject Area', text='Subject Area')
-        mentor_table.heading('Current Employer', text='Current Employer')
+        mentor_prfs_table.heading('#0', text='Approve')
+        mentor_prfs_table.heading('Mentor Id', text='Mentor Id')
+        mentor_prfs_table.heading('First Name', text='First Name')
+        mentor_prfs_table.heading('Last Name', text='Last Name')
+        mentor_prfs_table.heading('Mentor Email', text='Mentor Email')
+        mentor_prfs_table.heading('Cell Phone', text='Cell Phone')
+        mentor_prfs_table.heading('Subject Area', text='Subject Area')
+        mentor_prfs_table.heading('Current Employer', text='Current Employer')
 
-        mentor_table.column('#0', anchor="center", width=110)
-        mentor_table.column('Mentor Id', anchor="center", width=60)
-        mentor_table.column('First Name', anchor="center", width=100)
-        mentor_table.column('Last Name', anchor="center", width=100)
-        mentor_table.column('Mentor Email', anchor="center", width=130)
-        mentor_table.column('Cell Phone', anchor="center", width=100)
-        mentor_table.column('Subject Area', anchor="center", width=200)
-        mentor_table.column('Current Employer', anchor="center", width=200)
-        mentor_table.bind('<ButtonRelease-1>', lambda e: self.handle_mentor_sel(e, mentor_table))
+        mentor_prfs_table.column('#0', anchor="center", width=110)
+        mentor_prfs_table.column('Mentor Id', anchor="center", width=60)
+        mentor_prfs_table.column('First Name', anchor="center", width=100)
+        mentor_prfs_table.column('Last Name', anchor="center", width=100)
+        mentor_prfs_table.column('Mentor Email', anchor="center", width=130)
+        mentor_prfs_table.column('Cell Phone', anchor="center", width=100)
+        mentor_prfs_table.column('Subject Area', anchor="center", width=200)
+        mentor_prfs_table.column('Current Employer', anchor="center", width=200)
+        mentor_prfs_table.bind('<ButtonRelease-1>', lambda e: self.handle_mentor_sel(e, mentor_prfs_table))
 
         submit_selection_lb = tk.Label(head_frame)
         submit_selection_lb.grid(row = 6, column = 0)
@@ -160,14 +160,14 @@ class OrganizationDashboard(tk.Frame):
     def set_selected_mentors(self, mentors):
         self.selected_mentors = mentors
 
-    def handle_course_sel(self, event, course_table, mentor_table):
+    def handle_course_sel(self, event, course_table, mentor_prfs_table):
         cur_row = course_table.identify_row(event.y)
         values = course_table.item(cur_row)['values']
         course_id = values[0]
         self.set_sel_course_id(course_id)
         self.set_selected_mentors([])
         mentor_prfs = self.mentor_prf_model.select_by_course_id(course_id)
-        self.populate_preference_table(mentor_table, mentor_prfs)
+        self.populate_preference_table(mentor_prfs_table, mentor_prfs)
 
     def handle_mentor_sel(self, event, table):
         mentor_ids = self.get_selected_mentors().copy()
