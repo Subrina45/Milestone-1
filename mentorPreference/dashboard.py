@@ -152,13 +152,14 @@ class MentorDashboard(tk.Frame):
         record_frame.grid(row = 3, column = 0, sticky="NSEW")
 
         record_table = ttk.Treeview(record_frame,
-                                    columns=['ID', 'Course ID', 'Course Name', 'Subject Area', 'Organization Name', 
+                                    columns=['Status','ID', 'Course ID', 'Course Name', 'Subject Area', 'Organization Name', 
                                             'Start Date', 'End Date', 'Day', 'Start Time', 'End Time'])
         table_style = ttk.Style(record_table)
         table_style.configure('TreeView', rowheight=1)
         record_table.grid(row = 0, column = 0, sticky="NSEW")
 
         record_table.heading('#0', text='Select')
+        record_table.heading('Status', text='Application Status')
         record_table.heading('ID', text='ID')
         record_table.heading('Course ID', text='Course ID')
         record_table.heading('Course Name', text='Course Name')
@@ -170,7 +171,8 @@ class MentorDashboard(tk.Frame):
         record_table.heading('Start Time', text='Start Time')
         record_table.heading('End Time', text='Start Time')
 
-        record_table.column('#0', anchor="center", width=110)
+        record_table.column('#0', anchor="center", width=90)
+        record_table.column('Status', anchor="center", width=120)
         record_table.column('ID', anchor="center", width=40)
         record_table.column('Course ID', anchor="center", width=60)
         record_table.column('Course Name', anchor="center")
@@ -202,15 +204,14 @@ class MentorDashboard(tk.Frame):
         for element in entries:
             element.config(state= "normal")
             element.delete(0, tk.END)
-        # day.set("Monday")
         start_time_type.set("AM")
         end_time_type.set('AM')
-        # org_option.set("Choose an organization")
 
         for element in entries:
             element.config(state= "disable")
 
-    def populate_record_table(self, record_table, programs):
+    def populate_record_table(self, record_table, programs, approved_statuses):
+        applied_course_ids = approved_statuses.keys()
         for item in record_table.get_children():
             record_table.delete(item)
 
@@ -226,8 +227,17 @@ class MentorDashboard(tk.Frame):
             program_copy[-4] = end_day
             program_copy[-2] = start_time
             program_copy[-1] = end_time
+            program_copy.insert(0, '') # set application status to empty
+            tag = "unchecked"
+            img = self.im_unchecked
+
+            if program_copy[0] in applied_course_ids: # check for course id, if contains, it means already applied
+                tag = "checked"
+                img = self.im_checked
+
             record_table.insert(parent='', index='end',
-                                iid=r, values=tuple(program_copy), image=self.im_unchecked, tags="unchecked")
+                                iid=r, values=tuple(program_copy),
+                                image=img, tags=tag)
 
     def search_for_courses(self, record_table, time_info, subject_area):
         selected_days = time_info['selected_days']
@@ -263,8 +273,19 @@ class MentorDashboard(tk.Frame):
                                                                 'start_time': start_formatted,
                                                                 'end_time': end_formatted}
                                                                 ,subject_area)
+            # get all mentor preferences and check for approved courses
+            mentor_prfs = self.mentor_prf_model.select_by_mentor_id(self.parent_controller.get_credentials()[0])
+            approved_statuses = self.get_statuses_dict(mentor_prfs)
         # populate the record table with the courses
-        self.populate_record_table(record_table, courses)
+        self.populate_record_table(record_table, courses, approved_statuses)
+
+    def get_statuses_dict(self, courses):
+        """Constructs and returns a dictionary containing course_id:is_approved pairs
+        """
+        approved = {}
+        for course in courses:
+            approved[course[2]] = course[3] # assign each course id approved status
+        return approved
 
     def addToDaysList(self, cbox_state, value, day_list):
         """ add/remove value to a list of days
@@ -283,7 +304,7 @@ class MentorDashboard(tk.Frame):
         cur_row = record_table.identify_row(event.y)
         self.toggle_row_tag(record_table, cur_row)
         values = record_table.item(cur_row)['values']
-        course_id = values[0]
+        course_id = values[1] # get course id
         self.toggle_selected_course_ids(course_id, selected_course_ids)
 
     def toggle_selected_course_ids(self, course_id, courses):

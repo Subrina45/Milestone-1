@@ -35,6 +35,7 @@ class MentorPreferenceModel:
                         mentor_id INTEGER NOT NULL,
                         program_id INTEGER NOT NULL,
                         is_approved TINYINT DEFAULT 0,
+                        is_pending TINYINT DEFAULT 1,
                         UNIQUE(mentor_id, program_id)
                     );
                 """)
@@ -92,6 +93,26 @@ class MentorPreferenceModel:
         rows = cur.fetchall()
         self.close_connection(conn)
         return rows
+
+    def select_by_mentor_id(self, mentor_id):
+        """
+        Query mentor preferences by the mentor id
+        param mentor_id:
+        return:
+        """
+        conn = self.create_connection()
+        cur = conn.cursor()
+        cur.execute("""
+                    SELECT
+                        *
+                    FROM mentor_preferences
+                    WHERE mentor_preferences.mentor_id = ?
+                    """,
+                    (mentor_id,))
+        rows = cur.fetchall()
+        self.close_connection(conn)
+        return rows
+
 
     def set_approved_preferences(self, program_id, mentor_ids):
         """
