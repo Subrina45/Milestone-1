@@ -92,4 +92,34 @@ class MentorPreferenceModel:
         rows = cur.fetchall()
         self.close_connection(conn)
         return rows
+
+    def set_approved_preferences(self, program_id, mentor_ids):
+        """
+        Update is_approved column for the passed mentor ids with the passed course id
+        param program_id:
+        param mentor_ids: list containing mentor ids
+        return:
+        """
+        conn = self.create_connection()
+        cur = conn.cursor()
+        # first reset is_approved column of all rows to 0
+        # that have program_id column equals to a passed program_id
+        query = """
+                UPDATE mentor_preferences
+                SET is_approved = 0
+                WHERE program_id = ?
+                """
+        cur.execute(query, tuple(program_id,))
+
+        if len(mentor_ids) > 0:
+            query = """
+                    UPDATE mentor_preferences
+                    SET is_approved = 1
+                    WHERE program_id = ?
+                    AND mentor_id IN ({})
+                    """.format(','.join('?' for id in mentor_ids))
+            cur.execute(query, tuple(program_id,) + tuple(mentor_ids))
+        conn.commit()
+        self.close_connection(conn)
+        return cur.rowcount
                         

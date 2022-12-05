@@ -143,7 +143,7 @@ class OrganizationDashboard(tk.Frame):
         submit_btn = tk.Button(submit_selection_lb,
                                 text='Submit',
                                 font=organizations.fonts.sub,
-                                command=lambda: self.submit_selections(self.parent_controller.get_credentials()[0]))
+                                command=lambda: self.submit_selection())
         submit_btn.grid(row = 1, column = 0)
         return head_frame
         #end of construct frame method ---------------------------------------
@@ -239,3 +239,9 @@ class OrganizationDashboard(tk.Frame):
         self.populate_preference_table(mentor_prfs_table, [])
         programs = self.program_model.select_program_by_org_name(org_name)
         self.populate_course_table(course_table, programs)
+
+    def submit_selection(self):
+        row_count = self.mentor_prf_model.set_approved_preferences(str(self.get_sel_course_id()),
+                                                        self.get_selected_mentors())
+        if row_count > 0:
+            messagebox.showinfo("Successful", "Updated Successfully")
