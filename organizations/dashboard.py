@@ -165,6 +165,7 @@ class OrganizationDashboard(tk.Frame):
         values = course_table.item(cur_row)['values']
         course_id = values[0]
         self.set_sel_course_id(course_id)
+        self.set_selected_mentors([])
         mentor_prfs = self.mentor_prf_model.select_by_course_id(course_id)
         self.populate_preference_table(mentor_table, mentor_prfs)
 
