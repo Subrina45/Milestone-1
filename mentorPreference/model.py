@@ -63,3 +63,33 @@ class MentorPreferenceModel:
         cur.execute(sql, tuple(values))
         conn.commit()
         self.close_connection(conn)
+
+    def select_by_course_id(self, course_id):
+        """
+        Query mentor preferences by the course id
+        param course_id:
+        return:
+        """
+
+        conn = self.create_connection()
+        cur = conn.cursor()
+        cur.execute("""
+                    SELECT
+                        mentor_preferences.is_approved,
+                        mentors.id,
+                        mentors.first_name,
+                        mentors.last_name,
+                        mentors.email,
+                        mentors.cell_phone,
+                        mentors.subject_area,
+                        mentors.current_employer
+                    FROM mentor_preferences
+                    JOIN mentors 
+                    ON mentors.id = mentor_preferences.mentor_id
+                    WHERE mentor_preferences.program_id = ?
+                    """,
+                    (course_id,))
+        rows = cur.fetchall()
+        self.close_connection(conn)
+        return rows
+                        
