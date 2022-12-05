@@ -47,8 +47,8 @@ class MentorPreferenceModel:
         """
         values = []
         for id in course_ids:
-            values.append(id)
             values.append(mentor_id)
+            values.append(id)
 
         conn = self.create_connection()
         sql = 'INSERT INTO mentor_preferences(mentor_id, program_id)'
