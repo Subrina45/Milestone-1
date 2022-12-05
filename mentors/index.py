@@ -119,9 +119,7 @@ class Mentors(tk.Frame):
                             font=mentors.fonts.sub)
         search_entry.pack(anchor=tk.W)
 
-        #New______________________________________________________________________________
         search_entry.bind('<KeyRelease>', lambda e: self.find_mentor_by_subject(record_table, search_entry.get()))
-        #_________________________________________________________________________________
 
         search_bar_frame.pack(pady=0)
         search_bar_frame.pack_propagate(False)
@@ -136,16 +134,13 @@ class Mentors(tk.Frame):
         record_table = ttk.Treeview(record_frame)
         record_table.pack(fill=tk.X, pady=5)
                             
-        #New___________________________________________________________________
         record_table.bind('<ButtonRelease-1>', lambda e: self.put_mentor_in_entry(record_table, first_name, last_name,
                                                                                     mentor_email, cell_phone,
                                                                                     current_employer, subj_menu_value))
-        #______________________________________________________________________
 
         record_table['column'] = ['Mentor Id', 'First Name', 'Last Name', 'Mentor Email', 'Cell Phone', 'Subject Area', 'Current Employer']
 
         record_table.column('#0', anchor=tk.W, width=0, stretch=tk.NO)
-
         record_table.column('Mentor Id', anchor=tk.W, width=60)
         record_table.column('First Name', anchor=tk.W, width=100)
         record_table.column('Last Name', anchor=tk.W, width=100)
@@ -154,13 +149,10 @@ class Mentors(tk.Frame):
         record_table.column('Subject Area', anchor=tk.W, width=200)
         record_table.column('Current Employer', anchor=tk.W, width=200)
 
-
         record_frame.pack(pady=10)
         record_frame.pack_propagate(False)
         record_frame.configure(width=900, height=700)
-        #New_______________________________
         self.load_mentor_data(record_table)
-        #___________________________________
                                 
         record_table.heading('Mentor Id', text='Mentor Id', anchor=tk.W)
         record_table.heading('First Name', text='First Name', anchor=tk.W)
@@ -189,13 +181,11 @@ class Mentors(tk.Frame):
         mentor_id = values[0]
 
         mentor = self.model.select_mentor_by_id(mentor_id)[0]
-        print(mentor)
 
         first_name.delete(0, tk.END)
         last_name.delete(0, tk.END)
         mentor_email.delete(0, tk.END)
         cell_phone.delete(0, tk.END)
-        # subj_menu_value.delete(0, tk.END)
         subj_menu_value.set('')
         current_employer.delete(0, tk.END)
 
@@ -210,9 +200,7 @@ class Mentors(tk.Frame):
         mentor_email.insert(0, men_email)
         cell_phone.insert(0,cell_number)
         current_employer.insert(0, curr_employer)
-        # subj_menu_value.insert(0,sub_area)
         subj_menu_value.set(sub_area)
-
 
     def clear_mentor_data(self, entries, subj_option):
         for element in entries:
@@ -231,10 +219,7 @@ class Mentors(tk.Frame):
         values.append(elements[3].get())
         values.append(subj_id)
         values.append(elements[4].get())
-
-        # values.append(subj_id)
-
-        id = self.model.add_mentor(tuple(values))
+        mentor_id = self.model.add_mentor(tuple(values))
         self.clear_mentor_data(elements, subj_option)
         self.load_mentor_data(record_table)
 
@@ -249,12 +234,10 @@ class Mentors(tk.Frame):
         values.append(last_name.get())
         values.append(mentor_email.get())
         values.append(cell_phone.get())
+        values.append(subj_id)
         values.append(current_employer.get())
         values.append(mentor_id)
-        values.append(subj_id)
-        print(values)
         self.model.update_mentor(tuple(values))
-
         self.load_mentor_data(record_table)
         self.clear_mentor_data([first_name, last_name, 
                             mentor_email, cell_phone,
