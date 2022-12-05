@@ -92,11 +92,11 @@ class TrainingProgram(tk.Frame):
         # --------------------------------------------------------------------------------   
 
 
-        start_date_lb = tk.Label(entries_container, text='Start Date:', font=programs.fonts.sub)
+        start_date_lb = tk.Label(entries_container, text='Start Date (mm/dd/yyy):', font=programs.fonts.sub)
         start_date_lb.grid(row = 4, column = 0)
         start_date_entry = tk.Entry(entries_container, font=programs.fonts.sub)
         start_date_entry.grid(row = 4, column = 1, pady = 10)
-        end_date_lb = tk.Label(entries_container, text='End Date:', font=programs.fonts.sub)
+        end_date_lb = tk.Label(entries_container, text='End Date (mm/dd/yyy):', font=programs.fonts.sub)
         end_date_lb.grid(row = 5, column = 0)
         end_date_entry = tk.Entry(entries_container, font=programs.fonts.sub)
         end_date_entry.grid(row = 5, column = 1, pady = 10)
@@ -114,7 +114,7 @@ class TrainingProgram(tk.Frame):
         tk.OptionMenu(entries_container, day_choice, *days).grid(row = 6, column = 1, pady = 5)
 
 
-        start_time_lb = tk.Label(entries_container, text='Start Time(e.g 10:45):', font=programs.fonts.sub)
+        start_time_lb = tk.Label(entries_container, text='Start Time (e.g 10:45):', font=programs.fonts.sub)
         start_time_lb.grid(row = 7, column = 0)
         start_time_entry = tk.Entry(entries_container, font=programs.fonts.sub)
         start_time_entry.grid(row = 7, column = 1, pady = 10)
@@ -123,7 +123,7 @@ class TrainingProgram(tk.Frame):
         start_time_ops = tk.OptionMenu(entries_container, start_time_type, *time_types)
         start_time_ops.grid(row = 7, column = 2)
 
-        end_time_lb = tk.Label(entries_container, text='End Time(e.g 11:45):', font=programs.fonts.sub)
+        end_time_lb = tk.Label(entries_container, text='End Time (e.g 11:45):', font=programs.fonts.sub)
         end_time_lb.grid(row = 8, column = 0)
         end_time_entry = tk.Entry(entries_container, font=programs.fonts.sub)
         end_time_entry.grid(row = 8, column = 1)
