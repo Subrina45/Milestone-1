@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from programs.tpm import TrainingProgramModel
 from organizations.om import OrganizationsModel
+from subjects.fms import subjectsModel
 import programs.fonts
 from timeconverter.converter import TimeConverter
 
@@ -16,6 +17,7 @@ class TrainingProgram(tk.Frame):
         self.parent_controller = parent
         self.model = TrainingProgramModel(r"" + parent.get_db_path())
         self.org_model = OrganizationsModel(r"" + parent.get_db_path())
+        self.subj_model = subjectsModel(r"" + parent.get_db_path())
         self.container = self.get_initial_frame(self)
 
     def get_initial_frame(self, parent_frame):
@@ -39,7 +41,6 @@ class TrainingProgram(tk.Frame):
         menu_frame.grid_rowconfigure(0, weight = 1)
         menu_frame.grid_columnconfigure(0, weight = 1)
 
-
         entries_frame = ttk.LabelFrame(menu_frame)
         entries_frame.grid(row = 1, column = 0, sticky="NSEW")
 
@@ -56,17 +57,28 @@ class TrainingProgram(tk.Frame):
         course_name_entry = tk.Entry(entries_container, font=programs.fonts.sub)
         course_name_entry.grid(row = 1, column = 1, pady = 10)
 
+        # Drop down menu for choosing a subject area
+        # --------------------------------------------------------------------------------    
+        subject_area = self.subj_model.select_all()
         subject_area_lb = tk.Label(entries_container, text='Subject Area:', font=programs.fonts.sub)
-        subject_area_lb.grid(row = 2, column = 0)
-        subject_area_entry = tk.Entry(entries_container, font=programs.fonts.sub)
-        subject_area_entry.grid(row = 2, column = 1, pady = 10)
+        subject_area_lb.grid(row = 2, column = 0, pady = 5)
+        subj_options = [
+        "Choose a Subject area",
+        ]
 
+        for subject in subject_area:
+            subj_options.append(subject[1])
+
+        subj_menu_value = tk.StringVar()
+        subj_menu_value.set(subj_options[0]) # default value
+        tk.OptionMenu(entries_container, subj_menu_value, *subj_options).grid(row = 2, column = 1, pady = 5)
+        # --------------------------------------------------------------------------------   
 
         # Drop down menu to choose an university or organization
         # --------------------------------------------------------------------------------    
         organizations = self.org_model.select_all()
         organizations_lb = tk.Label(entries_container, text='Organization:', font=programs.fonts.sub)
-        organizations_lb.grid(row = 3, column = 0, pady = 10)
+        organizations_lb.grid(row = 3, column = 0, pady = 5)
         options = [
         "Choose an organization",
         ]
@@ -76,7 +88,7 @@ class TrainingProgram(tk.Frame):
 
         op_menu_value = tk.StringVar()
         op_menu_value.set(options[0]) # default value
-        tk.OptionMenu(entries_container, op_menu_value, *options).grid(row = 3, column = 1, pady = 10)
+        tk.OptionMenu(entries_container, op_menu_value, *options).grid(row = 3, column = 1, pady = 5)
         # --------------------------------------------------------------------------------   
 
 
@@ -89,7 +101,7 @@ class TrainingProgram(tk.Frame):
         end_date_entry = tk.Entry(entries_container, font=programs.fonts.sub)
         end_date_entry.grid(row = 5, column = 1, pady = 10)
 
-        tk.Label(entries_container, text='Day:', font=programs.fonts.sub).grid(row = 6, column = 0, pady = 10)
+        tk.Label(entries_container, text='Day:', font=programs.fonts.sub).grid(row = 6, column = 0, pady = 5)
         days = [
             "Monday",
             "Tuesday",
@@ -99,7 +111,7 @@ class TrainingProgram(tk.Frame):
         ]
         day_choice = tk.StringVar()
         day_choice.set(days[0]) # default value
-        tk.OptionMenu(entries_container, day_choice, *days).grid(row = 6, column = 1, pady = 10)
+        tk.OptionMenu(entries_container, day_choice, *days).grid(row = 6, column = 1, pady = 5)
 
 
         start_time_lb = tk.Label(entries_container, text='Start Time(e.g 10:45):', font=programs.fonts.sub)
@@ -126,33 +138,32 @@ class TrainingProgram(tk.Frame):
 
         register_btn = tk.Button(buttons_frame, text='Register', font=programs.fonts.mid,
                                 command=lambda: self.add_program(record_table, [course_id_entry, course_name_entry, 
-                                                                subject_area_entry, start_date_entry, end_date_entry,
+                                                                start_date_entry, end_date_entry,
                                                                 start_time_entry, end_time_entry],
                                                                 day_choice,
-                                                                [start_time_type, end_time_type], op_menu_value))
+                                                                [start_time_type, end_time_type], op_menu_value, subj_menu_value))
         register_btn.grid(row = 0, column = 0, padx = 10)
 
-        tk.Button(buttons_frame, text='Update', font=programs.fonts.mid,
-                command=lambda: self.update_program(record_table, course_id_entry, course_name_entry, 
-                subject_area_entry, start_date_entry, end_date_entry, start_time_entry, end_time_entry,
-                day_choice,
-                start_time_type, end_time_type, op_menu_value)).grid(row = 0, column = 1)
-
+        upd_btn = tk.Button(buttons_frame, text='Update', font=programs.fonts.mid,
+                            command=lambda: self.update_program(record_table, course_id_entry, course_name_entry,
+                                                            start_date_entry, end_date_entry, start_time_entry, end_time_entry,
+                                                            day_choice, start_time_type, end_time_type, op_menu_value, subj_menu_value))
+        upd_btn.grid(row = 0, column = 1)
 
         delete_btn = tk.Button(buttons_frame, text='Delete', font=programs.fonts.mid,
                             command=lambda: self.delete_program(record_table, [course_id_entry, course_name_entry, 
-                                                                subject_area_entry, start_date_entry, end_date_entry,
+                                                                start_date_entry, end_date_entry,
                                                                 start_time_entry, end_time_entry],
                                                                 day_choice,
-                                                                start_time_type, end_time_type, op_menu_value))
+                                                                start_time_type, end_time_type, op_menu_value, subj_menu_value))
         delete_btn.grid(row = 0, column = 2, padx = 10)
 
         clear_btn = tk.Button(buttons_frame, text='Clear', font=programs.fonts.mid,
                             command=lambda: self.clear_inputs([course_id_entry, course_name_entry, 
-                                                                subject_area_entry, start_date_entry, end_date_entry,
+                                                                start_date_entry, end_date_entry,
                                                                 start_time_entry, end_time_entry],
                                                                 day_choice,
-                                                                start_time_type, end_time_type, op_menu_value)
+                                                                start_time_type, end_time_type, op_menu_value, subj_menu_value)
                             )
         clear_btn.grid(row = 0, column = 3, padx = 10)
 
@@ -226,9 +237,9 @@ class TrainingProgram(tk.Frame):
         record_table.grid(row = 0, column = 0, sticky="NSEW")
                             
         record_table.bind('<ButtonRelease-1>', lambda e: self.put_into_entries(record_table, course_id_entry, course_name_entry, 
-                                                                            subject_area_entry, start_date_entry, end_date_entry,
+                                                                            start_date_entry, end_date_entry,
                                                                             start_time_entry, end_time_entry, day_choice, 
-                                                                            start_time_type, end_time_type, op_menu_value))
+                                                                            start_time_type, end_time_type, op_menu_value, subj_menu_value))
 
         record_table['column'] = ['ID', 'Course ID', 'Course Name', 'Subject Area', 'Organization Name', 
                                 'Start Date', 'End Date', 'Day', 'Start Time', 'End Time']
@@ -262,12 +273,14 @@ class TrainingProgram(tk.Frame):
 
     def load_data(self, record_table):
         programs = self.model.select_all()
+        print(programs)
         self.populate_record_table(record_table, programs)
 
     def put_into_entries(self, record_table, course_id_entry, course_name_entry,
-                        subject_area_entry, start_date_entry, end_date_entry,
-                        start_time_entry, end_time_entry, day,
-                        start_time_type, end_time_type, op_menu_value):
+                        start_date_entry, end_date_entry,
+                        start_time_entry, end_time_entry, 
+                        day, start_time_type, end_time_type,
+                        op_menu_value, subj_menu_value):
         curItem = record_table.focus()
         values = record_table.item(curItem)['values']
         program_id = values[0]
@@ -276,27 +289,25 @@ class TrainingProgram(tk.Frame):
 
         course_id_entry.delete(0, tk.END)
         course_name_entry.delete(0, tk.END)
-        subject_area_entry.delete(0, tk.END)
         start_date_entry.delete(0, tk.END)
         end_date_entry.delete(0, tk.END)
         start_time_entry.delete(0, tk.END)
         end_time_entry.delete(0, tk.END)
-
+        
         course_id = program[1]
         course_name = program[2]
-        sub_area = program[3]
         stat_date = self.time_con.unixtimestamp_to_date(program[4])
         end_date = self.time_con.unixtimestamp_to_date(program[5])
+        subj_name = program[-1]
         day_value = program[6]
         start_time = self.time_con.format_humanreadable(program[7], False)
         start_t_type = program[8]
         end_time = self.time_con.format_humanreadable(program[9], False)
         end_t_type = program[10]
-        org_name = program[-1]
+        org_name = program[-2]
 
         course_id_entry.insert(0, course_id)
         course_name_entry.insert(0, course_name)
-        subject_area_entry.insert(0, sub_area)
         start_date_entry.insert(0, stat_date)
         end_date_entry.insert(0, end_date)
         start_time_entry.insert(0, start_time)
@@ -305,27 +316,30 @@ class TrainingProgram(tk.Frame):
         end_time_entry.insert(0, end_time)
         end_time_type.set(end_t_type)
         op_menu_value.set(org_name)
+        subj_menu_value.set(subj_name)
 
-    def clear_inputs(self, entries, day, start_time_type, end_time_type, org_option):
+    def clear_inputs(self, entries, day, start_time_type, end_time_type, org_option, subj_option):
         for element in entries:
             element.delete(0, tk.END)
         day.set("Monday")
         start_time_type.set("AM")
         end_time_type.set('AM')
-        org_option.set("Choose an organization")
+        org_option.set("Choose an organization")        
+        subj_option.set("Choose a Subject Area")
 
-    def add_program(self, record_table, elements, day, time_types, org_option):
+    def add_program(self, record_table, elements, day, time_types, org_option, subj_option):
         values = []
         organization_id = self.org_model.select_by_name(org_option.get())[0][0]
+        subj_id = self.subj_model.select_by_name(subj_option.get())[0][0]
 
-        start_date = self.time_con.date_to_unixtimestamp(elements[3].get())
-        end_date = self.time_con.date_to_unixtimestamp(elements[4].get())
-        start_time = self.time_con.format_unixtimestamp(elements[5].get(), time_types[0].get())
-        end_time = self.time_con.format_unixtimestamp(elements[6].get(), time_types[1].get())
+        start_date = self.time_con.date_to_unixtimestamp(elements[2].get())
+        end_date = self.time_con.date_to_unixtimestamp(elements[3].get())
+        start_time = self.time_con.format_unixtimestamp(elements[4].get(), time_types[0].get())
+        end_time = self.time_con.format_unixtimestamp(elements[5].get(), time_types[1].get())
 
         values.append(elements[0].get())
         values.append(elements[1].get())
-        values.append(elements[2].get())
+        values.append(subj_id)
         values.append(start_date)
         values.append(end_date)
         values.append(day.get())
@@ -337,14 +351,14 @@ class TrainingProgram(tk.Frame):
         print(values)
 
         id = self.model.add_trainingProgram(tuple(values))
-        self.clear_inputs(elements, day, time_types[0], time_types[1], org_option)
+        self.clear_inputs(elements, day, time_types[0], time_types[1], org_option, subj_option)
         self.load_data(record_table)
 
     def update_program(self, record_table, course_id_entry, course_name_entry, 
-                        subject_area_entry, start_date_entry, end_date_entry,
+                        start_date_entry, end_date_entry,
                         start_time_entry, end_time_entry,
-                        day,
-                        start_time_type, end_time_type, op_menu_value):
+                        day, start_time_type, end_time_type,
+                        op_menu_value, subj_menu_value):
         cur_item = record_table.focus()
         program_id = record_table.item(cur_item)['values'][0]
         organization_id = self.org_model.select_by_name(op_menu_value.get())[0][0]
@@ -352,10 +366,11 @@ class TrainingProgram(tk.Frame):
         end_date = self.time_con.date_to_unixtimestamp(end_date_entry.get())
         start_time = self.time_con.format_unixtimestamp(start_time_entry.get(), start_time_type.get())
         end_time = self.time_con.format_unixtimestamp(end_time_entry.get(), end_time_type.get())
+        subj_id = self.subj_model.select_by_name(subj_menu_value.get())[0][0]
         values = []
         values.append(course_id_entry.get())
         values.append(course_name_entry.get())
-        values.append(subject_area_entry.get())
+        values.append(subj_id)
         values.append(start_date)
         values.append(end_date)
         values.append(day.get())
@@ -367,26 +382,26 @@ class TrainingProgram(tk.Frame):
         values.append(program_id)
 
         self.model.update_trainingProgram(tuple(values))
-
         self.load_data(record_table)
         self.clear_inputs([course_id_entry, course_name_entry, 
-                        subject_area_entry, start_date_entry, end_date_entry,
-                        start_time_entry, end_time_entry], day,
-                        start_time_type, end_time_type, op_menu_value)
+                            start_date_entry, end_date_entry,
+                            start_time_entry, end_time_entry], day,
+                            start_time_type, end_time_type, op_menu_value, subj_menu_value)
 
-    def delete_program(self, record_table, elements, day, start_time_type, end_time_type, op_menu_value):
+    def delete_program(self, record_table, elements, day, start_time_type, end_time_type, op_menu_value, subj_menu_value):
         cur_item = record_table.focus()
         values = record_table.item(cur_item)['values']
         program_id = values[0]
         print(program_id)
         self.model.delete_trainingProgram(program_id)
         self.load_data(record_table)
-        self.clear_inputs(elements, day, start_time_type, end_time_type, op_menu_value)
+        self.clear_inputs(elements, day, start_time_type, end_time_type, op_menu_value, subj_menu_value)
 
     def populate_record_table(self, record_table, programs):
         for item in record_table.get_children():
             record_table.delete(item)
 
+        print(programs)
         for r in range(len(programs)):
             program_copy = list(programs[r]).copy()
             program_copy.pop(-1) # remove end time type

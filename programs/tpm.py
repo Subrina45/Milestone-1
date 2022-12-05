@@ -113,8 +113,8 @@ class TrainingProgramModel:
                     SELECT 
                         TrainingProgram.id,
                         TrainingProgram.course_id,
-                        TrainingProgram.subject_area,
                         TrainingProgram.course_name,
+                        subjects.subject_area,
                         organizations.name,
                         TrainingProgram.start_date,
                         TrainingProgram.end_date,
@@ -125,7 +125,9 @@ class TrainingProgramModel:
                         TrainingProgram.end_time_type
                     FROM TrainingProgram
                     JOIN organizations
-                    ON organizations.id = TrainingProgram.organization_id"""
+                    ON organizations.id = TrainingProgram.organization_id
+                    JOIN subjects
+                    ON subjects.id = TrainingProgram.subject_area"""
                 )
         rows = cur.fetchall()
         self.close_connection(conn)
@@ -154,10 +156,12 @@ class TrainingProgramModel:
         conn = self.create_connection()
         cur = conn.cursor()
         cur.execute("""
-                    SELECT TrainingProgram.*, organizations.name
+                    SELECT TrainingProgram.*, organizations.name, subjects.subject_area
                     FROM TrainingProgram 
                     JOIN organizations 
                     ON organizations.id = TrainingProgram.organization_id
+                    JOIN subjects
+                    ON subjects.id = TrainingProgram.subject_area
                     WHERE TrainingProgram.id=?
                     """, (id,))
         rows = cur.fetchall()
@@ -176,7 +180,7 @@ class TrainingProgramModel:
                     SELECT
                         TrainingProgram.id,
                         TrainingProgram.course_id,
-                        TrainingProgram.subject_area,
+                        subjects.subject_area,
                         TrainingProgram.course_name,
                         organizations.name,
                         TrainingProgram.start_date,
@@ -189,6 +193,8 @@ class TrainingProgramModel:
                     FROM TrainingProgram
                     JOIN organizations 
                     ON organizations.id = TrainingProgram.organization_id
+                    JOIN subjects
+                    ON subjects.id = TrainingProgram.subject_area
                     WHERE organizations.name LIKE ?
                     """, ('%' + org_name + '%',))
         rows = cur.fetchall()
@@ -208,7 +214,7 @@ class TrainingProgramModel:
                     SELECT
                         TrainingProgram.id,
                         TrainingProgram.course_id,
-                        TrainingProgram.subject_area,
+                        subjects.subject_area,
                         TrainingProgram.course_name,
                         organizations.name,
                         TrainingProgram.start_date,
@@ -221,6 +227,8 @@ class TrainingProgramModel:
                     FROM TrainingProgram
                     JOIN organizations 
                     ON organizations.id = TrainingProgram.organization_id
+                    JOIN subjects
+                    ON subjects.id = TrainingProgram.subject_area
                     WHERE
                         TrainingProgram.start_time >= ?
                     AND
@@ -263,7 +271,7 @@ class TrainingProgramModel:
                 SELECT
                     TrainingProgram.id,
                     TrainingProgram.course_id,
-                    TrainingProgram.subject_area,
+                    subjects.subject_area,
                     TrainingProgram.course_name,
                     organizations.name,
                     TrainingProgram.start_date,
@@ -276,6 +284,8 @@ class TrainingProgramModel:
                 FROM TrainingProgram
                 JOIN organizations
                 ON organizations.id = TrainingProgram.organization_id
+                JOIN subjects
+                    ON subjects.id = TrainingProgram.subject_area
                 WHERE
                     TrainingProgram.day IN ({})
                 AND
@@ -283,7 +293,7 @@ class TrainingProgramModel:
                 AND
                     TrainingProgram.end_time <= ?
                 AND
-                    TrainingProgram.subject_area = ?
+                    subjects.subject_area = ?
                 """.format(','.join('?' for day in time_obj['selected_days']))
         query += start_date_filter
         query += end_date_filter

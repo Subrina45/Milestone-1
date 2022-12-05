@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from mentors.mm import MentorsModel
+from subjects.fms import subjectsModel
 import mentors.fonts
 
 class Mentors(tk.Frame):
@@ -12,6 +13,7 @@ class Mentors(tk.Frame):
         self.grid_columnconfigure(0, weight = 1)
         self.parent_controller = parent
         self.model = MentorsModel(r"" + parent.get_db_path())
+        self.subj_model = subjectsModel(r"" + parent.get_db_path())
         self.container = self.get_initial_frame(self)
 
     def get_initial_frame(self, parent_frame):
@@ -51,13 +53,28 @@ class Mentors(tk.Frame):
 
         subject_area_lb = tk.Label(head_frame, text='Subject Area:', font=mentors.fonts.sub)
         subject_area_lb.place(x=0, y=300)
+        # subject_area = tk.Entry(head_frame, font=mentors.fonts.sub)
+        # subject_area.place(x=110, y=300, width=180)
+        # Drop down menu to choose an university or organization
+        # --------------------------------------------------------------------------------    
+        subject_area = self.subj_model.select_all()
+        subject_area_lb = tk.Label(head_frame, text='Subject Area:', font=mentors.fonts.sub)
+        subject_area_lb.place(x=0, y=300)
+        subj_options = [
+        "Choose a Subject area",
+        ]
 
-        subject_area = tk.Entry(head_frame, font=mentors.fonts.sub)
-        subject_area.place(x=110, y=300, width=180)
+        for subject in subject_area:
+            subj_options.append(subject[1])
+
+        subj_menu_value = tk.StringVar()
+        subj_menu_value.set(subj_options[0]) # default value
+        tk.OptionMenu(head_frame, subj_menu_value, *subj_options).place(x=110, y=295, width=185)
+
+        # ----------------------------------------------------------------------------------
 
         current_employer_lb = tk.Label(head_frame, text='Current Employer:', font=mentors.fonts.sub)
         current_employer_lb.place(x=0, y=350)
-
         current_employer = tk.Entry(head_frame, font=mentors.fonts.sub)
         current_employer.place(x=110, y=350, width=180)
 
@@ -65,25 +82,25 @@ class Mentors(tk.Frame):
         register_btn = tk.Button(head_frame, text='Register', font=mentors.fonts.mid,
                                 command=lambda: self.add_mentor_data(record_table, [first_name, last_name, 
                                                                     mentor_email, cell_phone,
-                                                                    subject_area, current_employer]))
+                                                                    current_employer], subj_menu_value))
         register_btn.place(x=0, y=400)
 
         update_btn = tk.Button(head_frame, text='Update', font=mentors.fonts.mid,
-                            command=lambda: self.update_student_data(record_table, first_name, last_name, 
+                            command=lambda: self.update_mentor_data(record_table, first_name, last_name, 
                                                                     mentor_email, cell_phone,
-                                                                    subject_area, current_employer))
+                                                                    current_employer, subj_menu_value))
         update_btn.place(x=85, y=400)
 
         delete_btn = tk.Button(head_frame, text='Delete', font=mentors.fonts.mid,
                             command=lambda: self.delete_mentor_data(record_table, [first_name, last_name,
                                                                     mentor_email, cell_phone,
-                                                                    subject_area, current_employer]))
+                                                                    current_employer], subj_menu_value))
         delete_btn.place(x=160, y=400)
 
         clear_btn = tk.Button(head_frame, text='Clear', font=mentors.fonts.mid,
                             command=lambda: self.clear_mentor_data([first_name, last_name,
                                                                     mentor_email, cell_phone,
-                                                                    subject_area, current_employer])
+                                                                    current_employer], subj_menu_value)
                             )
         clear_btn.place(x=230, y=400)
 
@@ -102,9 +119,7 @@ class Mentors(tk.Frame):
                             font=mentors.fonts.sub)
         search_entry.pack(anchor=tk.W)
 
-        #New______________________________________________________________________________
         search_entry.bind('<KeyRelease>', lambda e: self.find_mentor_by_subject(record_table, search_entry.get()))
-        #_________________________________________________________________________________
 
         search_bar_frame.pack(pady=0)
         search_bar_frame.pack_propagate(False)
@@ -119,16 +134,13 @@ class Mentors(tk.Frame):
         record_table = ttk.Treeview(record_frame)
         record_table.pack(fill=tk.X, pady=5)
                             
-        #New___________________________________________________________________
         record_table.bind('<ButtonRelease-1>', lambda e: self.put_mentor_in_entry(record_table, first_name, last_name,
                                                                                     mentor_email, cell_phone,
-                                                                                    subject_area, current_employer))
-        #______________________________________________________________________
+                                                                                    current_employer, subj_menu_value))
 
         record_table['column'] = ['Mentor Id', 'First Name', 'Last Name', 'Mentor Email', 'Cell Phone', 'Subject Area', 'Current Employer']
 
         record_table.column('#0', anchor=tk.W, width=0, stretch=tk.NO)
-
         record_table.column('Mentor Id', anchor=tk.W, width=60)
         record_table.column('First Name', anchor=tk.W, width=100)
         record_table.column('Last Name', anchor=tk.W, width=100)
@@ -137,13 +149,10 @@ class Mentors(tk.Frame):
         record_table.column('Subject Area', anchor=tk.W, width=200)
         record_table.column('Current Employer', anchor=tk.W, width=200)
 
-
         record_frame.pack(pady=10)
         record_frame.pack_propagate(False)
         record_frame.configure(width=900, height=700)
-        #New_______________________________
         self.load_mentor_data(record_table)
-        #___________________________________
                                 
         record_table.heading('Mentor Id', text='Mentor Id', anchor=tk.W)
         record_table.heading('First Name', text='First Name', anchor=tk.W)
@@ -166,19 +175,18 @@ class Mentors(tk.Frame):
                                 iid=r, values=mentors[r])
 
     def put_mentor_in_entry(self, record_table, first_name, last_name, mentor_email,
-                            cell_phone, subject_area, current_employer):
+                            cell_phone, current_employer, subj_menu_value):
         curItem = record_table.focus()
         values = record_table.item(curItem)['values']
         mentor_id = values[0]
 
         mentor = self.model.select_mentor_by_id(mentor_id)[0]
-        print(mentor)
 
         first_name.delete(0, tk.END)
         last_name.delete(0, tk.END)
         mentor_email.delete(0, tk.END)
         cell_phone.delete(0, tk.END)
-        subject_area.delete(0, tk.END)
+        subj_menu_value.set('')
         current_employer.delete(0, tk.END)
 
         fir_name = mentor[1]
@@ -186,60 +194,64 @@ class Mentors(tk.Frame):
         men_email = mentor[3]
         cell_number = mentor[4]
         sub_area = mentor[5]
-        curr_employer = mentor[6]
-        
+        curr_employer = mentor[6]        
         first_name.insert(0,fir_name )
         last_name.insert(0,las_name )
         mentor_email.insert(0, men_email)
         cell_phone.insert(0,cell_number)
-        subject_area.insert(0,sub_area )
         current_employer.insert(0, curr_employer)
+        subj_menu_value.set(sub_area)
 
-    def clear_mentor_data(self, entries):
+    def clear_mentor_data(self, entries, subj_option):
         for element in entries:
             element.delete(0, tk.END)
+        subj_option.set("Choose a Subject Area")
 
-    def add_mentor_data(self, record_table, elements):
+    def add_mentor_data(self, record_table, elements, subj_option):
         values = []
-
-        for element in elements:
-            print(element.get())
-            values.append(element.get())
-
-        id = self.model.add_mentor(tuple(values))
-        self.clear_mentor_data(elements)
+        subj_id = self.subj_model.select_by_name(subj_option.get())[0][0]
+        # for element in elements:
+        #     print(element)
+        #     values.append(element.get())
+        values.append(elements[0].get())
+        values.append(elements[1].get())
+        values.append(elements[2].get())
+        values.append(elements[3].get())
+        values.append(subj_id)
+        values.append(elements[4].get())
+        mentor_id = self.model.add_mentor(tuple(values))
+        self.clear_mentor_data(elements, subj_option)
         self.load_mentor_data(record_table)
 
-    def update_student_data(self, record_table, first_name, last_name, 
+    def update_mentor_data(self, record_table, first_name, last_name, 
                             mentor_email, cell_phone,
-                            subject_area, current_employer):
+                            current_employer, subj_menu_value):
         curItem = record_table.focus()
         mentor_id = record_table.item(curItem)['values'][0]
-
+        subj_id = self.subj_model.select_by_name(subj_menu_value.get())[0][0]
         values = []
         values.append(first_name.get())
         values.append(last_name.get())
         values.append(mentor_email.get())
         values.append(cell_phone.get())
-        values.append(subject_area.get())
+        values.append(subj_id)
         values.append(current_employer.get())
         values.append(mentor_id)
-        print(values)
         self.model.update_mentor(tuple(values))
-
         self.load_mentor_data(record_table)
         self.clear_mentor_data([first_name, last_name, 
                             mentor_email, cell_phone,
-                            subject_area, current_employer])
+                            current_employer], subj_menu_value)
 
-    def delete_mentor_data(self, record_table, elements):
+    def delete_mentor_data(self, record_table, elements, subject_area):
         curItem = record_table.focus()
         values = record_table.item(curItem)['values']
         mentor_id = values[0]
         print(mentor_id)
         self.model.delete_mentor(mentor_id)
         self.load_mentor_data(record_table)
-        self.clear_mentor_data(elements)
+        self.clear_mentor_data(elements, subject_area)
+        
 
     def find_mentor_by_subject(self, record_table, subject_area):
         if subject_area != "":

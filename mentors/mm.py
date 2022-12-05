@@ -37,7 +37,7 @@ class MentorsModel:
                     last_name TEXT NOT NULL,
                     email TEXT NOT NULL,
                     cell_phone TEXT NOT NULL,
-                    subject_area TEXT NOT NULL,
+                    subject_area_id TEXT NOT NULL,
                     current_employer TEXT NOT NULL
                 ); """)
         self.close_connection(conn)
@@ -49,7 +49,7 @@ class MentorsModel:
         :return: mentor id
         """
         conn = self.create_connection()
-        sql = ''' INSERT INTO mentors(first_name,last_name,email,cell_phone,subject_area,current_employer)
+        sql = ''' INSERT INTO mentors(first_name,last_name,email,cell_phone,subject_area_id,current_employer)
                 VALUES(?,?,?,?,?,?) '''
         cur = conn.cursor()
         cur.execute(sql, mentor)
@@ -60,7 +60,7 @@ class MentorsModel:
 
     def update_mentor(self, mentor):
         """
-        update first_name, last_name, email, cell_phone, subject_area, current_employer of a mentor
+        update first_name, last_name, email, cell_phone, subject_area_id, current_employer of a mentor
         :param mentor:
         """
         conn = self.create_connection()
@@ -69,7 +69,7 @@ class MentorsModel:
                     last_name = ? ,
                     email = ? ,
                     cell_phone = ? ,
-                    subject_area = ? , 
+                    subject_area_id = ? , 
                     current_employer = ?
                 WHERE id = ?'''
         cur = conn.cursor()
@@ -83,9 +83,25 @@ class MentorsModel:
         Query all rows in the mentors table
         :return:
         """
+        query = """
+                SELECT
+                    mentors.id,
+                    mentors.first_name,
+                    mentors.last_name,
+                    mentors.email,
+                    mentors.cell_phone,
+                    subjects.subject_area,
+                    mentors.current_employer
+                FROM
+                    mentors
+                JOIN
+                    subjects
+                ON
+                    subjects.id = mentors.subject_area_id
+                """
         conn = self.create_connection()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM mentors")
+        cur.execute(query)
         rows = cur.fetchall()
         self.close_connection(conn)
         return rows
@@ -96,9 +112,27 @@ class MentorsModel:
         :param id:
         :return:
         """
+        query = """
+                SELECT
+                    mentors.id,
+                    mentors.first_name,
+                    mentors.last_name,
+                    mentors.email,
+                    mentors.cell_phone,
+                    subjects.subject_area,
+                    mentors.current_employer
+                FROM
+                    mentors
+                JOIN
+                    subjects
+                ON
+                    subjects.id = mentors.subject_area_id
+                WHERE
+                    mentors.id=?
+                """
         conn = self.create_connection()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM mentors WHERE id=?", (id,))
+        cur.execute(query, (id,))
         rows = cur.fetchall()
         self.close_connection(conn)
         return rows
@@ -109,9 +143,27 @@ class MentorsModel:
         :param subject_area:
         :return:
         """
+        query = """
+                SELECT
+                    mentors.id,
+                    mentors.first_name,
+                    mentors.last_name,
+                    mentors.email,
+                    mentors.cell_phone,
+                    subjects.subject_area,
+                    mentors.current_employer
+                FROM
+                    mentors
+                JOIN
+                    subjects
+                ON
+                    subjects.id = mentors.subject_area_id
+                WHERE
+                    subjects.subject_area LIKE ?
+                """
         conn = self.create_connection()
         cur = conn.cursor()
-        cur.execute("SELECT * FROM mentors WHERE subject_area LIKE ?", ('%' + subject_area + '%',))
+        cur.execute(query, ('%' + subject_area + '%',))
         rows = cur.fetchall()
         self.close_connection(conn)
         return rows
