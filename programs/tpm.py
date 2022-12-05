@@ -293,7 +293,7 @@ class TrainingProgramModel:
                 AND
                     TrainingProgram.end_time <= ?
                 AND
-                    subjects.subject_area = ?
+                    subjects.id = ?
                 """.format(','.join('?' for day in time_obj['selected_days']))
         query += start_date_filter
         query += end_date_filter
