@@ -4,6 +4,7 @@ from startMenu.sp import StartPage
 from mentors.index import Mentors
 from programs.index import TrainingProgram
 from organizations.index import Organizations
+from subjects.index import SubjectsForm
   
 
 class tkinterApp(tk.Tk):

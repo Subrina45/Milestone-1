@@ -25,3 +25,6 @@ class StartPage(tk.Frame):
         
         button3 = ttk.Button(menu_frame, text = "Mentors", command = lambda : parent.show_frame('Mentors'))
         button3.grid(row = 1, column = 0, padx=15, pady=15)
+
+        button5 = ttk.Button(menu_frame, text = "Subject Areas", command = lambda : parent.show_frame('SubjectsForm'))
+        button5.grid(row = 1, column = 1, padx=15, pady=15)
