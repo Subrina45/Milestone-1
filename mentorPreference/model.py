@@ -127,7 +127,7 @@ class MentorPreferenceModel:
         # that have program_id column equals to a passed program_id
         query = """
                 UPDATE mentor_preferences
-                SET is_approved = 0
+                SET is_approved = 0, is_pending = 0
                 WHERE program_id = ?
                 """
         cur.execute(query, tuple(program_id,))

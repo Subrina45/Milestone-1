@@ -231,7 +231,20 @@ class MentorDashboard(tk.Frame):
             tag = "unchecked"
             img = self.im_unchecked
 
-            if program_copy[0] in applied_course_ids: # check for course id, if contains, it means already applied
+            course_id = program_copy[1]
+            if course_id in applied_course_ids: # check for course id, if contains, it means already applied
+                # check pending status
+                if approved_statuses[course_id]['is_pending'] == 1:
+                    # if pending status is set,
+                    # means the application has not been denied or confirmed yet
+                    program_copy[0] = 'Pending'
+                elif approved_statuses[course_id]['is_pending'] == 0:
+                    # if pending status is not set, 
+                    # means the application has been denied or confirmed
+                    if approved_statuses[course_id]['is_approved'] == 1:
+                        program_copy[0] = 'Approved'
+                    elif approved_statuses[course_id]['is_approved'] == 0:
+                        program_copy[0] = 'Unapproved'
                 tag = "checked"
                 img = self.im_checked
 
@@ -284,7 +297,10 @@ class MentorDashboard(tk.Frame):
         """
         approved = {}
         for course in courses:
-            approved[course[2]] = course[3] # assign each course id approved status
+            # assign each course id
+            # approved status and pending status
+            approved[course[2]] = {'is_approved':course[3],
+                                    'is_pending':course[4]}
         return approved
 
     def addToDaysList(self, cbox_state, value, day_list):
