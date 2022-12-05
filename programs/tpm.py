@@ -238,3 +238,69 @@ class TrainingProgramModel:
         self.close_connection(conn)
         return rows
 
+    def select_by_time_sub_area(self, time_obj, sub_area):
+        print('time_obj', time_obj)
+        """
+        Search for courser/programs by matching the time and subject area
+        param time_obj: a dictionary containing information with days and times
+        param subject_area:
+        return: list
+        """
+
+        sql_values = []
+        for day in time_obj['selected_days']:
+            sql_values.append(day)
+
+        sql_values.append(time_obj['start_time'])
+        sql_values.append(time_obj['end_time'])
+        sql_values.append(sub_area)
+
+        # if a value for the start date is passed, add an appropriate sql condition
+        start_date_filter = ''
+        if time_obj['start_date'] != '':
+            start_date_filter = 'AND TrainingProgram.start_date >= ?'
+            sql_values.append(time_obj['start_date'])
+
+        # if a value for the end date is passed, add an appropriate sql condition
+        end_date_filter = ''
+        if time_obj['end_date'] != '':
+            end_date_filter = 'AND TrainingProgram.end_date <= ?'
+            sql_values.append(time_obj['end_date'])
+
+        query = """
+                SELECT
+                    TrainingProgram.id,
+                    TrainingProgram.course_id,
+                    subjects.subject_area,
+                    TrainingProgram.course_name,
+                    organizations.name,
+                    TrainingProgram.start_date,
+                    TrainingProgram.end_date,
+                    TrainingProgram.day,
+                    TrainingProgram.start_time,
+                    TrainingProgram.start_time_type,
+                    TrainingProgram.end_time,
+                    TrainingProgram.end_time_type
+                FROM TrainingProgram
+                JOIN organizations
+                ON organizations.id = TrainingProgram.organization_id
+                JOIN subjects
+                    ON subjects.id = TrainingProgram.subject_area
+                WHERE
+                    TrainingProgram.day IN ({})
+                AND
+                    TrainingProgram.start_time >= ?
+                AND
+                    TrainingProgram.end_time <= ?
+                AND
+                    subjects.id = ?
+                """.format(','.join('?' for day in time_obj['selected_days']))
+        query += start_date_filter
+        query += end_date_filter
+
+        conn = self.create_connection()
+        cur = conn.cursor()
+        cur.execute(query, tuple(sql_values))
+        rows = cur.fetchall()
+        self.close_connection(conn)
+        return rows

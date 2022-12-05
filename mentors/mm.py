@@ -168,6 +168,31 @@ class MentorsModel:
         self.close_connection(conn)
         return rows
 
+    def select_by_id_and_name(self, id, first_name, last_name):
+        """
+        Return a matched mentor for by passed id, first name, and last name
+        param: int - id
+        param: string - first_name
+        param: string - last_name
+        :return: array
+        """
+        conn = self.create_connection()
+        cur = conn.cursor()
+        cur.execute("""
+                    SELECT * FROM mentors
+                    WHERE id = ? 
+                    AND
+                    first_name = ?
+                    AND
+                    last_name = ?
+                    """,
+                    (id, first_name, last_name)
+                    )
+        rows = cur.fetchall()
+        self.close_connection(conn)
+        return rows
+
+
     def delete_mentor(self, id):
         print('delete', id)
         """
