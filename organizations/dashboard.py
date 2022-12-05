@@ -66,7 +66,7 @@ class OrganizationDashboard(tk.Frame):
         tk.Label(head_frame,
                 text= 'Select a course to see the applications for it',
                 bg='pink',
-                font=organizations.fonts.main).grid(row = 2, column = 0, pady=25)
+                font=organizations.fonts.main).grid(row = 2, column = 0, pady=15)
 
         course_frame = tk.Label(head_frame)
         course_frame.grid(row = 3, column = 0)
@@ -101,13 +101,14 @@ class OrganizationDashboard(tk.Frame):
         course_table.column('End Date', anchor="center", width=110)
         course_table.column('Start Time', anchor="center", width=90)
         course_table.column('End Time', anchor="center", width=90)
-        course_table.bind('<ButtonRelease-1>', lambda e: self.handle_course_sel(e, course_table, mentor_prfs_table))
+        course_table.bind('<ButtonRelease-1>', lambda e: self.handle_course_sel(e, course_table, mentor_prfs_table, mentor_prfs_lb))
         # COURSE TABLE section end -----------------------------------------------
 
-        tk.Label(head_frame,
-                text= 'Select mentor(s) for the course',
-                bg='pink',
-                font=organizations.fonts.main).grid(row = 4, column = 0, pady=25)
+        mentor_prfs_lb = tk.Label(head_frame,
+                                text= 'Select mentor(s) for the course',
+                                bg='pink',
+                                font=organizations.fonts.main)
+        mentor_prfs_lb.grid(row = 4, column = 0, pady=15)
 
         mentor_frame = tk.Label(head_frame)
         mentor_frame.grid(row = 5, column = 0)
@@ -160,7 +161,7 @@ class OrganizationDashboard(tk.Frame):
     def set_selected_mentors(self, mentors):
         self.selected_mentors = mentors
 
-    def handle_course_sel(self, event, course_table, mentor_prfs_table):
+    def handle_course_sel(self, event, course_table, mentor_prfs_table, lb):
         cur_row = course_table.identify_row(event.y)
         values = course_table.item(cur_row)['values']
         course_id = values[0]
@@ -168,6 +169,7 @@ class OrganizationDashboard(tk.Frame):
         self.set_selected_mentors([])
         mentor_prfs = self.mentor_prf_model.select_by_course_id(course_id)
         self.populate_preference_table(mentor_prfs_table, mentor_prfs)
+        lb.config(text = 'Select mentor(s) for the course. Found {} mentors for the course'.format(len(mentor_prfs)))
 
     def handle_mentor_sel(self, event, table):
         mentor_ids = self.get_selected_mentors().copy()
