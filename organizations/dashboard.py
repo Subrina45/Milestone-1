@@ -233,6 +233,9 @@ class OrganizationDashboard(tk.Frame):
             table.insert(parent='', index='end',
                         iid=r, values=tuple(program_copy))
 
-    def submit_org_choice(self, org_name, table):
+    def submit_org_choice(self, org_name, course_table, mentor_prfs_table):
+        self.set_sel_course_id(None)
+        self.set_selected_mentors([])
+        self.populate_preference_table(mentor_prfs_table, [])
         programs = self.program_model.select_program_by_org_name(org_name)
-        self.populate_course_table(table, programs)
+        self.populate_course_table(course_table, programs)
